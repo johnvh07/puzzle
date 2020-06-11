@@ -168,9 +168,15 @@ app.loader.add(imgPath).load(function() {
   function onDragMove(event) {
     if (this.isDragging) {
       const pointerPosition = event.data.getLocalPosition(this.parent);
+      var squarePosition = {
+        x: pointerPosition.x - this.dragStartOffset.x,
+        y: pointerPosition.y - this.dragStartOffset.y
+      };
+      squarePosition.x = _.clamp(squarePosition.x, 0, app.screen.width);//keep visible on screen 
+      squarePosition.y = _.clamp(squarePosition.y, 0, app.screen.height);
       modifySquare(this.squareID, [
-        [['position', 'x'], pointerPosition.x - this.dragStartOffset.x],
-        [['position', 'y'], pointerPosition.y - this.dragStartOffset.y],
+        [['position', 'x'], squarePosition.x],
+        [['position', 'y'], squarePosition.y],
       ]);
     }
   }
