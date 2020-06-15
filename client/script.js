@@ -33,7 +33,7 @@ function setObjectPath(obj, keyParts, value) {
   o[finalKeyPart] = value;
 }
 
-const squareIDRowMultiplier = 1000; // Never do a puzzle with 1001 or more columns
+const squareIDRowMultiplier = 10000; // Never do a puzzle with 10001 or more columns
 const getSquareID = function(row, column) {
   return row * squareIDRowMultiplier + column;
 };
@@ -101,8 +101,8 @@ app.loader.add(imgPath).load(function() {
 
       const square = new PIXI.Sprite(texture);
       square.squareID = squareID;
-      square.x = (colIdx+.55) * squareSize * 1.05;
-      square.y = (rowIdx+.55) * squareSize * 1.05;
+      // square.x = (colIdx+.55) * squareSize * 1.05;
+      // square.y = (rowIdx+.55) * squareSize * 1.05;
       square.width = square.height = squareSize;
       square.anchor.set(0.5);
 
@@ -114,10 +114,18 @@ app.loader.add(imgPath).load(function() {
         .on('pointerupoutside', onDragEnd)
         .on('pointermove', onDragMove);
 
-      app.stage.addChild(square);
       squares[squareID] = square;
     }
   }
+  _.shuffle(Object.keys(squares)).forEach(squareID => {
+    const square = squares[squareID];
+
+    square.x = 100;
+    square.y = 100;
+
+    app.stage.addChild(square);
+  });
+
 
   function modifySquare(squareID, modifications) {
     // All modifications to `squares` must happen via this function.
