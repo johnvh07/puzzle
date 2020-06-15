@@ -182,10 +182,10 @@ app.loader.add(imgPath).load(function() {
       };
       squarePosition.x = _.clamp(squarePosition.x, 0, app.screen.width);//keep visible on screen 
       squarePosition.y = _.clamp(squarePosition.y, 0, app.screen.height);
-      modifySquare(this.squareID, [
-        [['position', 'x'], squarePosition.x],
-        [['position', 'y'], squarePosition.y],
-      ]);
+      modifySquare(this.squareID, {
+        'x': squarePosition.x,
+        'y': squarePosition.y,
+      });
     }
   }
   function onDragEnd() {
@@ -210,10 +210,10 @@ app.loader.add(imgPath).load(function() {
       );
       if (distanceFromAlignment < squareSize / 10) {
         console.log(this.squareID, neighborSquare.squareID, distanceFromAlignment);
-        modifySquare(this.squareID, [
-          [['position', 'x'], neighborSquare.position.x - correctOffsetX],
-          [['position', 'y'], neighborSquare.position.y - correctOffsetY],
-        ]);
+        modifySquare(this.squareID, {
+          'x': neighborSquare.position.x - correctOffsetX,
+          'y': neighborSquare.position.y - correctOffsetY,
+        });
         return; // Don't align to any more neighbors.
       }
     }
