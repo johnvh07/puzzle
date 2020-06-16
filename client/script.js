@@ -11,6 +11,33 @@
 // + Let users upload images (perhaps with password required)
 // + Rotate pieces - Tap an edge to point it up? Drag a corner (shown on hover)? Drag across rotator-zone? Right-click? Shake? Or don't?
 
+// QUESTIONS:
+// 
+
+
+// New approach:
+// `syncmap = {...}`
+// to change anything: `syncmap.set(key, path, value)`
+//   + syncmap.set("image_url", [], "https://petervh.com/lily.jpg")
+//   + syncmap.set("piece:1001", [], {x:100, y:0})
+// to see the current state, use `syncmap.get(key, path)`
+// to see when state has changed, use `syncmap.onChange(function(key){})`
+//   + 
+
+// How do we cut the image into pieces?
+// User chooses image (ie, aspect ratio) and approximate number of pieces
+// 
+
+
+// Things to know:
+// + squareSize (calculated dyamically)
+// + where a piece comes from on the source image (baseTexture)
+//   1. figure out numRows and numCols based on the pieces.
+//   2. set squareRawSize = floor(min(pic.width/numCols, pic.height/numRows))
+//   3. get a texture for each (x, y, width, height) - this needs some kind of memoization that won't memory-leak
+// + 
+
+
 window._d = window._d || {}; // for debugging in browser console
 
 function setObjectPath(obj, keyParts, value) {
