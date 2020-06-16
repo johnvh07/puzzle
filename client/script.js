@@ -157,11 +157,11 @@ app.loader.add(imgPath).load(function() {
   }
   _.shuffle(Object.keys(squares)).forEach((squareID,idx) => {
     const square = squares[squareID];
-    const numOfCol = (app.screen.width / squareSize) - 3;
-    const col = idx % numOfCol;
-    const row = Math.floor(idx/numOfCol);
-    square.x = (col + 0.6)*squareSize * 1.1;
-    square.y = (row + 0.6)*squareSize * 1.1;
+    const numOfCols = Math.floor(app.screen.width / (squareSize*1.1) - 0.2);
+    const col = idx % numOfCols;
+    const row = Math.floor(idx/numOfCols);
+    square.x = (0.1 * squareSize) + (0.5 * squareSize) + (col * 1.1 * squareSize);
+    square.y = (0.1 * squareSize) + (0.5 * squareSize) + (row * 1.1 * squareSize);
     app.stage.addChild(square);
   });
 
