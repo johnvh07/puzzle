@@ -59,9 +59,10 @@ const getNeighbors = _.memoize(function(squareID) {
 
 
 
+const screenSize = Math.min(window.innerWidth, window.innerHeight);
 const app = new PIXI.Application({
-  backgroundColor:0x00ff00,
-  width:600, height:600,
+  backgroundColor:0x444444,
+  width:screenSize, height:screenSize,
 });
 app.stage.sortableChildren = true; // required for zIndex to have any effect
 document.body.appendChild(app.view);
@@ -72,13 +73,23 @@ app.loader.add(imgPath).load(function() {
 
   // `squareRawSize` is the width and height of the square extracted from the input image (which is stored in `baseTexture`)
   // `squareSize` is the width and height of the square drawn into the <canvas> (which is accessed via `app.screen`)
-  const squareRawSize = Math.floor(baseTexture.height / 5);
-  const numCols = Math.floor(baseTexture.width / squareRawSize);
-  let squareSize = app.screen.height / 5;
+  const minNumPieces = 100;
+  let numRows = 1;
+  while(1) {
+    var squareRawSize = Math.floor(baseTexture.height / numRows);
+    var numCols = Math.floor(baseTexture.width / squareRawSize);
+    const numPieces = numRows * numCols;
+    if (numPieces > minNumPieces) {
+      break;
+    } else {
+      numRows++;
+    }
+  }
+  let squareSize = app.screen.height / numRows;
   if (squareSize * numCols > app.screen.width) {
     squareSize = Math.floor(app.screen.width / numCols);
   }
-  squareSize *= 0.8; // shrink pieces a little to leave empty workspace
+  squareSize *= 0.6; // shrink pieces a little to leave empty workspace
   console.log(`${baseTexture.width}x${baseTexture.height}`, squareRawSize, '-', `${app.screen.width}x${app.screen.height}`, squareSize);
 
   const getCorrectPosition = _.memoize(function(squareID) {
@@ -117,15 +128,15 @@ app.loader.add(imgPath).load(function() {
       squares[squareID] = square;
     }
   }
-  _.shuffle(Object.keys(squares)).forEach(squareID => {
+  _.shuffle(Object.keys(squares)).forEach((squareID,idx) => {
     const square = squares[squareID];
-
-    square.x = 100;
-    square.y = 100;
-
+    const numOfCol = (app.screen.width / squareSize) - 3;
+    const col = idx % numOfCol;
+    const row = Math.floor(idx/numOfCol);
+    square.x = (col + 0.6)*squareSize * 1.1;
+    square.y = (row + 0.6)*squareSize * 1.1;
     app.stage.addChild(square);
   });
-
 
   function modifySquare(squareID, modifications) {
     // All modifications to `squares` must happen via this function.
