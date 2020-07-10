@@ -3,39 +3,15 @@
 // Note: the image must be served via http* due to CORS.
 
 // TODO:
-// + Shuffle squares at the start.
+// + "Harry Potter" live image puzzle
+// + Let user choose minNumPieces, either with `?pieces=500` in URL or with input box.
 
 // LATER:
 // + Select a group of pieces to drag? Or glue aligned pieces so that they move together (perhaps by combining into a SquareGroup)?
-// + "Harry Potter" live image puzzle
 // + Let users upload images (perhaps with password required)
 // + Rotate pieces - Tap an edge to point it up? Drag a corner (shown on hover)? Drag across rotator-zone? Right-click? Shake? Or don't?
+// + Add sync
 
-// QUESTIONS:
-// 
-
-
-// New approach:
-// `syncmap = {...}`
-// to change anything: `syncmap.set(key, path, value)`
-//   + syncmap.set("image_url", [], "https://petervh.com/lily.jpg")
-//   + syncmap.set("piece:1001", [], {x:100, y:0})
-// to see the current state, use `syncmap.get(key, path)`
-// to see when state has changed, use `syncmap.onChange(function(key){})`
-//   + 
-
-// How do we cut the image into pieces?
-// User chooses image (ie, aspect ratio) and approximate number of pieces
-// 
-
-
-// Things to know:
-// + squareSize (calculated dyamically)
-// + where a piece comes from on the source image (baseTexture)
-//   1. figure out numRows and numCols based on the pieces.
-//   2. set squareRawSize = floor(min(pic.width/numCols, pic.height/numRows))
-//   3. get a texture for each (x, y, width, height) - this needs some kind of memoization that won't memory-leak
-// + 
 
 
 window._d = window._d || {}; // for debugging in browser console
@@ -86,14 +62,13 @@ const getNeighbors = _.memoize(function(squareID) {
 
 
 
-const screenSize = Math.min(window.innerWidth, window.innerHeight);
 const app = new PIXI.Application({
   backgroundColor:0x444444,
-  width:screenSize, height:screenSize,
+  width:window.innerWidth - 3, height:window.innerHeight - 10,
 });
 app.stage.sortableChildren = true; // required for zIndex to have any effect
 document.body.appendChild(app.view);
-const imgPath = 'https://petervh.com/lily.jpg';
+const imgPath = 'https://petervh.com/viv-frames/1.jpg';
 app.loader.add(imgPath).load(function() {
 
   const baseTexture = PIXI.BaseTexture.from(imgPath);
@@ -101,22 +76,19 @@ app.loader.add(imgPath).load(function() {
   // `squareRawSize` is the width and height of the square extracted from the input image (which is stored in `baseTexture`)
   // `squareSize` is the width and height of the square drawn into the <canvas> (which is accessed via `app.screen`)
   const minNumPieces = 100;
-  let numRows = 1;
-  while(1) {
+  for(var numRows = 1;; numRows++) {
     var squareRawSize = Math.floor(baseTexture.height / numRows);
     var numCols = Math.floor(baseTexture.width / squareRawSize);
     const numPieces = numRows * numCols;
     if (numPieces > minNumPieces) {
       break;
-    } else {
-      numRows++;
     }
   }
   let squareSize = app.screen.height / numRows;
   if (squareSize * numCols > app.screen.width) {
     squareSize = Math.floor(app.screen.width / numCols);
   }
-  squareSize *= 0.6; // shrink pieces a little to leave empty workspace
+  squareSize *= 0.7; // shrink pieces a little to leave empty workspace
   console.log(`${baseTexture.width}x${baseTexture.height}`, squareRawSize, '-', `${app.screen.width}x${app.screen.height}`, squareSize);
 
   const getCorrectPosition = _.memoize(function(squareID) {
@@ -124,7 +96,7 @@ app.loader.add(imgPath).load(function() {
     return {
       x: col * squareSize,
       y: row * squareSize,
-    }
+    };
   });
 
   const squares = {}; window._d.squares = squares;
@@ -218,12 +190,9 @@ app.loader.add(imgPath).load(function() {
         x: pointerPosition.x - this.dragStartOffset.x,
         y: pointerPosition.y - this.dragStartOffset.y
       };
-      squarePosition.x = _.clamp(squarePosition.x, 0, app.screen.width);//keep visible on screen 
+      squarePosition.x = _.clamp(squarePosition.x, 0, app.screen.width);//keep visible on screen
       squarePosition.y = _.clamp(squarePosition.y, 0, app.screen.height);
-      modifySquare(this.squareID, {
-        'x': squarePosition.x,
-        'y': squarePosition.y,
-      });
+      modifySquare(this.squareID, squarePosition);
     }
   }
   function onDragEnd() {
@@ -247,7 +216,7 @@ app.loader.add(imgPath).load(function() {
         Math.pow(correctOffsetY - actualOffsetY, 2)
       );
       if (distanceFromAlignment < squareSize / 10) {
-        console.log(this.squareID, neighborSquare.squareID, distanceFromAlignment);
+        // console.log(this.squareID, neighborSquare.squareID, distanceFromAlignment);
         modifySquare(this.squareID, {
           'x': neighborSquare.position.x - correctOffsetX,
           'y': neighborSquare.position.y - correctOffsetY,
