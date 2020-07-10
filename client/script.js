@@ -16,6 +16,14 @@
 
 window._d = window._d || {}; // for debugging in browser console
 
+function fmt(format) {
+  // fmt("a {0} c {1}", "b", "d") === "a b c d"
+  var args = Array.prototype.slice.call(arguments, 1);
+  return format.replace(/{(\d+)}/g, function(match, number) {
+    return (typeof args[number] != 'undefined') ? args[number] : match;
+  });
+}
+
 function setObjectPath(obj, keyParts, value) {
   // Set `obj[keyParts[0]][keyParts[1]][keyParts[2]] = value`, for any number of keyParts
   if (keyParts.length === 0) { return; }
@@ -68,17 +76,21 @@ const app = new PIXI.Application({
 });
 app.stage.sortableChildren = true; // required for zIndex to have any effect
 document.body.appendChild(app.view);
-const imgPath = 'https://petervh.com/viv-frames/1.jpg';
-app.loader.add(imgPath).load(function() {
+const imgPaths = _.range(1, 1+47).map(i => `https://petervh.com/viv-frames/${i}.jpg`);
 
-  const baseTexture = PIXI.BaseTexture.from(imgPath);
+imgPaths.forEach(imgPath => app.loader.add(imgPath));
+app.loader.load(function() {
+
+  const baseTextures = imgPaths.map(imgPath => PIXI.BaseTexture.from(imgPath));
+  const firstBaseTexture = baseTextures[0];
+  // TODO: assert that all baseTextures have the same width and height
 
   // `squareRawSize` is the width and height of the square extracted from the input image (which is stored in `baseTexture`)
   // `squareSize` is the width and height of the square drawn into the <canvas> (which is accessed via `app.screen`)
   const minNumPieces = 100;
   for(var numRows = 1;; numRows++) {
-    var squareRawSize = Math.floor(baseTexture.height / numRows);
-    var numCols = Math.floor(baseTexture.width / squareRawSize);
+    var squareRawSize = Math.floor(firstBaseTexture.height / numRows);
+    var numCols = Math.floor(firstBaseTexture.width / squareRawSize);
     const numPieces = numRows * numCols;
     if (numPieces > minNumPieces) {
       break;
@@ -88,8 +100,8 @@ app.loader.add(imgPath).load(function() {
   if (squareSize * numCols > app.screen.width) {
     squareSize = Math.floor(app.screen.width / numCols);
   }
-  squareSize *= 0.7; // shrink pieces a little to leave empty workspace
-  console.log(`${baseTexture.width}x${baseTexture.height}`, squareRawSize, '-', `${app.screen.width}x${app.screen.height}`, squareSize);
+  squareSize *= 0.8; // shrink pieces a little to leave empty workspace
+  console.log(`${firstBaseTexture.width}x${firstBaseTexture.height}`, squareRawSize, '-', `${app.screen.width}x${app.screen.height}`, squareSize);
 
   const getCorrectPosition = _.memoize(function(squareID) {
     const [row, col] = getRowAndCol(squareID);
@@ -100,21 +112,24 @@ app.loader.add(imgPath).load(function() {
   });
 
   const squares = {}; window._d.squares = squares;
-  for (let colIdx = 0; (colIdx+1)*squareRawSize < baseTexture.width; colIdx++) {
-    for (let rowIdx = 0; (rowIdx+1)*squareRawSize < baseTexture.height; rowIdx++) {
+  for (let colIdx = 0; (colIdx+1)*squareRawSize < firstBaseTexture.width; colIdx++) {
+    for (let rowIdx = 0; (rowIdx+1)*squareRawSize < firstBaseTexture.height; rowIdx++) {
       const squareID = getSquareID(rowIdx, colIdx);
 
-      const texture = new PIXI.Texture(
+      const textures = baseTextures.map(baseTexture => new PIXI.Texture(
         baseTexture,
         new PIXI.Rectangle(colIdx*squareRawSize, rowIdx*squareRawSize, squareRawSize, squareRawSize)
-      );
+      ));
+      textures.push(...textures.slice().reverse());
 
-      const square = new PIXI.Sprite(texture);
+      const square = new PIXI.AnimatedSprite(textures);
       square.squareID = squareID;
       // square.x = (colIdx+.55) * squareSize * 1.05;
       // square.y = (rowIdx+.55) * squareSize * 1.05;
       square.width = square.height = squareSize;
       square.anchor.set(0.5);
+      square.animationSpeed = 0.5;
+      square.play();
 
       square.buttonMode = true; // show "hand" cursor when hovered
       square.interactive = true; // required for mouse/touch interaction
