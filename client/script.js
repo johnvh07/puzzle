@@ -100,7 +100,7 @@ app.loader.load(function() {
   if (squareSize * numCols > app.screen.width) {
     squareSize = Math.floor(app.screen.width / numCols);
   }
-  squareSize *= 0.8; // shrink pieces a little to leave empty workspace
+  squareSize *= 0.85; // shrink pieces a little to leave empty workspace
   console.log(`${firstBaseTexture.width}x${firstBaseTexture.height}`, squareRawSize, '-', `${app.screen.width}x${app.screen.height}`, squareSize);
 
   const getCorrectPosition = _.memoize(function(squareID) {
@@ -144,101 +144,48 @@ app.loader.load(function() {
   }
   _.shuffle(Object.keys(squares)).forEach((squareID,idx) => {
     const square = squares[squareID];
-    const numOfCols = Math.floor(app.screen.width / (squareSize*1.1) - 0.2);
+    const numOfCols = Math.floor(app.screen.width / squareSize - 0.05);
     const col = idx % numOfCols;
     const row = Math.floor(idx/numOfCols);
-    square.x = (0.1 * squareSize) + (0.5 * squareSize) + (col * 1.1 * squareSize);
-    square.y = (0.1 * squareSize) + (0.5 * squareSize) + (row * 1.1 * squareSize);
+    square.x = (0.5 * squareSize) + (col * squareSize);
+    square.y = (0.5 * squareSize) + (row * squareSize);
     app.stage.addChild(square);
   });
-
-  function modifySquare(squareID, modifications) {
-    // All modifications to `squares` must happen via this function.
-    // That is, `squares` and it's descendants must NEVER be modified outside this function.
-    // If `modifications` is `undefined` (ie, omitted), delete the square.
-    // If `squares[squareID]` doesn't exist, create the square.
-    // `modifications` can be either:
-    //   - an object {key1:value1,key2:value2,...}, or
-    //   - an array [[[keyPart1a,keyPart1b],value1],[[keyPart2a,keyPart2b],value2]] to hierarchically assign inside the square using setObjectPath().
-    if (typeof modifications === 'undefined') {
-      delete squares[squareID];
-
-    } else {
-      if (!squares[squareID]) {
-        squares[squareID] = {};
-      }
-      if (!_.isArray(modifications)) {
-        if (_.isObject(modifications)) {
-          // convert from {a:1,b:2} to [[['a'],1], [['b'],2]]
-          modifications = _.map(modifications, (value, key) => [[key], value]);
-        } else {
-          throw `Cannot use this value of \`modifications\` in modifySquare(${JSON.stringify(squareID)},...): ${JSON.stringify(modifications)}`;
-        }
-      }
-      for (let [keyParts, value] of modifications) {
-        if (!Array.isArray(keyParts)) { keyParts = [keyParts]; }
-        setObjectPath(squares[squareID], keyParts, value);
-      }
-    }
-  }
 
   function onDragStart(event) {
     // Remember the offset from the center of the square to the pointer,
     //  because in onDragMove() we don't just want to center the square
     //  on the whever the pointer is.
-    const pointerPosition = event.data.getLocalPosition(this.parent);
-    modifySquare(this.squareID, {
-      dragStartOffset: {
-        x: pointerPosition.x - this.position.x,
-        y: pointerPosition.y - this.position.y,
-      },
-      alpha: 0.85,
-      isDragging: true,
-      // Show this square above all other squares.  This requires 'this.parent.sortableChildren'.
-      zIndex: 1 + _.max(Object.values(squares).map(sq => sq.zIndex)),
-    });
+    const square = this;
+    const pointerPosition = event.data.getLocalPosition(square.parent);
+    square.dragStartOffset = {
+      x: pointerPosition.x - this.position.x,
+      y: pointerPosition.y - this.position.y,
+    };
+    square.isDragging = true;
+    // Show this square above all other squares.  This requires 'this.parent.sortableChildren'.
+    square.zIndex = 1 + _.max(Object.values(squares).map(sq => sq.zIndex));
   }
   function onDragMove(event) {
-    if (this.isDragging) {
-      const pointerPosition = event.data.getLocalPosition(this.parent);
+    const square = this;
+    if (square.isDragging) {
+      const pointerPosition = event.data.getLocalPosition(square.parent);
       var squarePosition = {
         x: pointerPosition.x - this.dragStartOffset.x,
         y: pointerPosition.y - this.dragStartOffset.y
       };
-      squarePosition.x = _.clamp(squarePosition.x, 0, app.screen.width);//keep visible on screen
+      squarePosition.x = _.clamp(squarePosition.x, 0, app.screen.width); //keep visible on screen
       squarePosition.y = _.clamp(squarePosition.y, 0, app.screen.height);
-      modifySquare(this.squareID, squarePosition);
+      squarePosition.x = (Math.floor(squarePosition.x / squareSize) + 0.5) * squareSize;
+      squarePosition.y = (Math.floor(squarePosition.y / squareSize) + 0.5) * squareSize;
+      square.x = squarePosition.x;
+      square.y = squarePosition.y;
     }
   }
   function onDragEnd() {
-    modifySquare(this.squareID, {
-      alpha: 1,
-      isDragging: false,
-      dragStartOffset: undefined,
-    });
-    // If the square is nearly aligned with one of its neighbors,
-    // then align it exactly to that neighbor.
-    const selfCorrectPosition = getCorrectPosition(this.squareID);
-    const neighborSquares = getNeighbors(this.squareID).filter(sID => squares[sID]).map(sID => squares[sID]);
-    for (const neighborSquare of neighborSquares) {
-      const neighborCorrectPosition = getCorrectPosition(neighborSquare.squareID);
-      const correctOffsetX = neighborCorrectPosition.x - selfCorrectPosition.x;
-      const correctOffsetY = neighborCorrectPosition.y - selfCorrectPosition.y;
-      const actualOffsetX = neighborSquare.position.x - this.position.x;
-      const actualOffsetY = neighborSquare.position.y - this.position.y;
-      const distanceFromAlignment = Math.sqrt(
-        Math.pow(correctOffsetX - actualOffsetX, 2) +
-        Math.pow(correctOffsetY - actualOffsetY, 2)
-      );
-      if (distanceFromAlignment < squareSize / 10) {
-        // console.log(this.squareID, neighborSquare.squareID, distanceFromAlignment);
-        modifySquare(this.squareID, {
-          'x': neighborSquare.position.x - correctOffsetX,
-          'y': neighborSquare.position.y - correctOffsetY,
-        });
-        return; // Don't align to any more neighbors.
-      }
-    }
+    const square = this;
+    square.isDragging = false;
+    square.dragStartOffset = undefined;
   }
 
 });
