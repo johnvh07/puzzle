@@ -3,71 +3,24 @@
 // Note: the image must be served via http* due to CORS.
 
 // TODO:
-// + "Harry Potter" live image puzzle
+// + `grid.setSquarePos(squareID, col, row)`, `grid.getSquare(col, row)`, `grid.size`
+// + When one piece clobbers another, push the clobbered piece somewhere else (nearest empty spot?  furthest?) (do automatically in `grid.setSquarePos(*, true)`?
 // + Let user choose minNumPieces, either with `?pieces=500` in URL or with input box.
+// + Show a border between misaligned pieces?
 
 // LATER:
 // + Select a group of pieces to drag? Or glue aligned pieces so that they move together (perhaps by combining into a SquareGroup)?
 // + Let users upload images (perhaps with password required)
-// + Rotate pieces - Tap an edge to point it up? Drag a corner (shown on hover)? Drag across rotator-zone? Right-click? Shake? Or don't?
-// + Add sync
-
+// + Rotate pieces - Tap an edge to point it up? Drag a corner (shown on hover)? Drag across rotator-zone? Right-click? Shake? Two-finger? Or don't?
+// + Add sync?
 
 
 window._d = window._d || {}; // for debugging in browser console
-
-function fmt(format) {
-  // fmt("a {0} c {1}", "b", "d") === "a b c d"
-  var args = Array.prototype.slice.call(arguments, 1);
-  return format.replace(/{(\d+)}/g, function(match, number) {
-    return (typeof args[number] != 'undefined') ? args[number] : match;
-  });
-}
-
-function setObjectPath(obj, keyParts, value) {
-  // Set `obj[keyParts[0]][keyParts[1]][keyParts[2]] = value`, for any number of keyParts
-  if (keyParts.length === 0) { return; }
-  if (typeof obj !== 'object') {
-    throw 'cannot use setObjectPath() on non-object ${JSON.stringify(obj)}';
-  }
-  let o = obj;
-  const nonFinalKeyParts = keyParts.slice(0, keyParts.length - 1);
-  const finalKeyPart = keyParts[keyParts.length - 1];
-  for (const keyPart of nonFinalKeyParts) {
-    if (typeof o[keyPart] === 'undefined') {
-      o[keyPart] = {};
-    } else if (!_.isObject(o[keyPart])) {
-      throw `setObject(${JSON.stringify(obj)}, ${JSON.stringify(keyParts)}, ${JSON.stringify(value)}) failed trying to sub-path to a non-object at key ${JSON.stringify(keyPart)} of ${JSON.stringify(o)}.`;
-    }
-    o = o[keyPart];
-  }
-  o[finalKeyPart] = value;
-}
 
 const squareIDRowMultiplier = 10000; // Never do a puzzle with 10001 or more columns
 const getSquareID = function(row, column) {
   return row * squareIDRowMultiplier + column;
 };
-const getRowAndCol = _.memoize(function(squareID) {
-  return [
-    Math.floor(squareID / squareIDRowMultiplier),
-    squareID % squareIDRowMultiplier
-  ];
-});
-const getNeighbors = _.memoize(function(squareID) {
-  // Given a squareID like `3004` (ie, row=3, column=4),
-  // return the IDs of the squares above, below, and beside the square,
-  // which are [2004, 3003, 3005, 4004].
-  squareID = +squareID;
-  const [row, col] = getRowAndCol(squareID);
-  return [
-    getSquareID(row-1, col),
-    getSquareID(row, col-1),
-    getSquareID(row, col+1),
-    getSquareID(row+1, col),
-  ];
-});
-
 
 
 const app = new PIXI.Application({
@@ -102,14 +55,6 @@ app.loader.load(function() {
   }
   squareSize *= 0.85; // shrink pieces a little to leave empty workspace
   console.log(`${firstBaseTexture.width}x${firstBaseTexture.height}`, squareRawSize, '-', `${app.screen.width}x${app.screen.height}`, squareSize);
-
-  const getCorrectPosition = _.memoize(function(squareID) {
-    const [row, col] = getRowAndCol(squareID);
-    return {
-      x: col * squareSize,
-      y: row * squareSize,
-    };
-  });
 
   const squares = {}; window._d.squares = squares;
   for (let colIdx = 0; (colIdx+1)*squareRawSize < firstBaseTexture.width; colIdx++) {
