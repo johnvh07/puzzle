@@ -4,12 +4,11 @@
 
 // TODO:
 // + `grid.setSquarePos(squareID, col, row)`, `grid.getSquare(col, row)`, `grid.size`
-// + When one piece clobbers another, push the clobbered piece somewhere else (nearest empty spot?  furthest?) (do automatically in `grid.setSquarePos(*, true)`?
 // + Let user choose minNumPieces, either with `?pieces=500` in URL or with input box.
 // + Show a border between misaligned pieces?
 
 // LATER:
-// + Select a group of pieces to drag? Or glue aligned pieces so that they move together (perhaps by combining into a SquareGroup)?
+// + Select a group of pieces to drag? Or glue aligned pieces so that they move together?
 // + Let users upload images (perhaps with password required)
 // + Rotate pieces - Tap an edge to point it up? Drag a corner (shown on hover)? Drag across rotator-zone? Right-click? Shake? Two-finger? Or don't?
 // + Add sync?
@@ -38,6 +37,7 @@ app.loader.load(function() {
   const firstBaseTexture = baseTextures[0];
   // TODO: assert that all baseTextures have the same width and height
 
+  // Define the grid:
   // `squareRawSize` is the width and height of the square extracted from the input image (which is stored in `baseTexture`)
   // `squareSize` is the width and height of the square drawn into the <canvas> (which is accessed via `app.screen`)
   const minNumPieces = 100;
@@ -56,44 +56,59 @@ app.loader.load(function() {
   squareSize *= 0.85; // shrink pieces a little to leave empty workspace
   console.log(`${firstBaseTexture.width}x${firstBaseTexture.height}`, squareRawSize, '-', `${app.screen.width}x${app.screen.height}`, squareSize);
 
-  const squares = {}; window._d.squares = squares;
-  for (let colIdx = 0; (colIdx+1)*squareRawSize < firstBaseTexture.width; colIdx++) {
-    for (let rowIdx = 0; (rowIdx+1)*squareRawSize < firstBaseTexture.height; rowIdx++) {
-      const squareID = getSquareID(rowIdx, colIdx);
-
-      const textures = baseTextures.map(baseTexture => new PIXI.Texture(
-        baseTexture,
-        new PIXI.Rectangle(colIdx*squareRawSize, rowIdx*squareRawSize, squareRawSize, squareRawSize)
-      ));
-      textures.push(...textures.slice().reverse());
-
-      const square = new PIXI.AnimatedSprite(textures);
-      square.squareID = squareID;
-      // square.x = (colIdx+.55) * squareSize * 1.05;
-      // square.y = (rowIdx+.55) * squareSize * 1.05;
-      square.width = square.height = squareSize;
-      square.anchor.set(0.5);
-      square.animationSpeed = 0.5;
-      square.play();
-
-      square.buttonMode = true; // show "hand" cursor when hovered
-      square.interactive = true; // required for mouse/touch interaction
-      square
-        .on('pointerdown', onDragStart) // `pointer` catches both mouse and touch
-        .on('pointerup', onDragEnd)
-        .on('pointerupoutside', onDragEnd)
-        .on('pointermove', onDragMove);
-
-      squares[squareID] = square;
+  const imgRowColPairs = Array.from(function* () {
+    for (let colIdx = 0; (colIdx+1)*squareRawSize < firstBaseTexture.width; colIdx++) {
+      for (let rowIdx = 0; (rowIdx+1)*squareRawSize < firstBaseTexture.height; rowIdx++) {
+        yield [rowIdx, colIdx];
+      }
     }
+  }());
+  const screenRowColPairs = Array.from(function* () {
+    for (let colIdx = 0; (colIdx+1)*squareSize < app.screen.width; colIdx++) {
+      for (let rowIdx = 0; (rowIdx+1)*squareSize < app.screen.height; rowIdx++) {
+        yield [rowIdx, colIdx];
+      }
+    }
+  }());
+  function getXYFromRowCol(row, col) {
+    return [0.5 * squareSize + col * squareSize, 0.5 * squareSize + row * squareSize];
   }
+  const screenXYPairs = screenRowColPairs.map(([row,col]) => getXYFromRowCol(row, col));
+
+  // Initialize the squares:
+  const squares = {}; window._d.squares = squares;
+  for (let [rowIdx, colIdx] of imgRowColPairs) {
+    const squareID = getSquareID(rowIdx, colIdx);
+
+    const textures = baseTextures.map(baseTexture => new PIXI.Texture(
+      baseTexture,
+      new PIXI.Rectangle(colIdx*squareRawSize, rowIdx*squareRawSize, squareRawSize, squareRawSize)
+    ));
+    textures.push(...textures.slice().reverse());
+
+    const square = new PIXI.AnimatedSprite(textures);
+    square.squareID = squareID;
+    square.width = square.height = squareSize;
+    square.anchor.set(0.5);
+    square.animationSpeed = 0.5;
+    square.play();
+
+    square.buttonMode = true; // show "hand" cursor when hovered
+    square.interactive = true; // required for mouse/touch interaction
+    square
+      .on('pointerdown', onDragStart) // `pointer` catches both mouse and touch
+      .on('pointerup', onDragEnd)
+      .on('pointerupoutside', onDragEnd)
+      .on('pointermove', onDragMove);
+
+    squares[squareID] = square;
+  }
+
   _.shuffle(Object.keys(squares)).forEach((squareID,idx) => {
     const square = squares[squareID];
-    const numOfCols = Math.floor(app.screen.width / squareSize - 0.05);
-    const col = idx % numOfCols;
-    const row = Math.floor(idx/numOfCols);
-    square.x = (0.5 * squareSize) + (col * squareSize);
-    square.y = (0.5 * squareSize) + (row * squareSize);
+    const [x, y] = screenXYPairs[idx];
+    square.x = x;
+    square.y = y;
     app.stage.addChild(square);
   });
 
@@ -121,16 +136,26 @@ app.loader.load(function() {
       };
       squarePosition.x = _.clamp(squarePosition.x, 0, app.screen.width); //keep visible on screen
       squarePosition.y = _.clamp(squarePosition.y, 0, app.screen.height);
-      squarePosition.x = (Math.floor(squarePosition.x / squareSize) + 0.5) * squareSize;
-      squarePosition.y = (Math.floor(squarePosition.y / squareSize) + 0.5) * squareSize;
-      square.x = squarePosition.x;
-      square.y = squarePosition.y;
+      [square.x, square.y] = getXYFromRowCol(Math.floor(squarePosition.y / squareSize), Math.floor(squarePosition.x / squareSize));
     }
   }
   function onDragEnd() {
     const square = this;
     square.isDragging = false;
     square.dragStartOffset = undefined;
+    // Check if this piece covers any other piece
+    // TODO: Make this not be O(n^2).  Maybe make a set of occupied XY before iterating squareXYPairs.
+    _.each(squares, sq => {
+      if (sq.squareID !== square.squareID && Math.abs(sq.x - square.x) < squareSize/4 && Math.abs(sq.y - square.y) < squareSize/4) {
+        // Find an empty spot
+        for (let [x, y] of screenXYPairs.slice().reverse()) {
+          if (!_.some(squares, s => s.x === x && s.y === y)) {
+            sq.x = x;
+            sq.y = y;
+            break;
+          }
+        }
+      }
+    });
   }
-
 });
