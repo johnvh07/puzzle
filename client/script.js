@@ -5,13 +5,14 @@
 // TODO:
 // + `grid.setSquarePos(squareID, col, row)`, `grid.getSquare(col, row)`, `grid.size`
 // + Let user choose minNumPieces, either with `?pieces=500` in URL or with input box.
-// + Show a border between misaligned pieces?
+// + When picking up a piece, also pick up correct neighbors (and their correct neighbors, etc)
 
 // LATER:
 // + Select a group of pieces to drag? Or glue aligned pieces so that they move together?
 // + Let users upload images (perhaps with password required)
 // + Rotate pieces - Tap an edge to point it up? Drag a corner (shown on hover)? Drag across rotator-zone? Right-click? Shake? Two-finger? Or don't?
 // + Add sync?
+// + Show a border between misaligned pieces?
 
 
 window._d = window._d || {}; // for debugging in browser console
@@ -54,6 +55,12 @@ app.loader.load(function() {
     squareSize = Math.floor(app.screen.width / numCols);
   }
   squareSize *= 0.85; // shrink pieces a little to leave empty workspace
+  let numShownCols = Math.floor(app.screen.width / squareSize);
+  let numShownRows = Math.floor(app.screen.height / squareSize);
+  squareSize = Math.floor(Math.min(
+    app.screen.width / numShownCols,
+    app.screen.height / numShownRows
+  ));
   console.log(`${firstBaseTexture.width}x${firstBaseTexture.height}`, squareRawSize, '-', `${app.screen.width}x${app.screen.height}`, squareSize);
 
   const imgRowColPairs = Array.from(function* () {
