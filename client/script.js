@@ -39,69 +39,68 @@ app.loader.load(function() {
   // TODO: assert that all baseTextures have the same width and height
 
   // Define the grid:
-  // `squareRawSize` is the width and height of the square extracted from the input image (which is stored in `baseTexture`)
-  // `squareSize` is the width and height of the square drawn into the <canvas> (which is accessed via `app.screen`)
+  // `sourceSquareSize` is the width and height of the square extracted from the input image (which is stored in `baseTexture`)
+  // `screenSquareSize` is the width and height of the square drawn into the <canvas> (which is accessed via `app.screen`)
   const minNumPieces = 100;
-  for(var numRows = 1;; numRows++) {
-    var squareRawSize = Math.floor(firstBaseTexture.height / numRows);
-    var numCols = Math.floor(firstBaseTexture.width / squareRawSize);
-    const numPieces = numRows * numCols;
+  for(var sourceNumRows = 1;; sourceNumRows++) {
+    var sourceSquareSize = Math.floor(firstBaseTexture.height / sourceNumRows);
+    var sourceNumCols = Math.floor(firstBaseTexture.width / sourceSquareSize);
+    const numPieces = sourceNumRows * sourceNumCols;
     if (numPieces > minNumPieces) {
       break;
     }
   }
-  let squareSize = app.screen.height / numRows;
-  if (squareSize * numCols > app.screen.width) {
-    squareSize = Math.floor(app.screen.width / numCols);
+  let screenSquareSize = app.screen.height / sourceNumRows;
+  if (screenSquareSize * sourceNumCols > app.screen.width) {
+    screenSquareSize = Math.floor(app.screen.width / sourceNumCols);
   }
-  squareSize *= 0.85; // shrink pieces a little to leave empty workspace
-  let numShownCols = Math.floor(app.screen.width / squareSize);
-  let numShownRows = Math.floor(app.screen.height / squareSize);
-  squareSize = Math.floor(Math.min(
-    app.screen.width / numShownCols,
-    app.screen.height / numShownRows
-  ));
-  console.log(`${firstBaseTexture.width}x${firstBaseTexture.height}`, squareRawSize, '-', `${app.screen.width}x${app.screen.height}`, squareSize);
+  screenSquareSize *= 0.85; // shrink pieces a little to leave empty workspace
+  let screenNumCols = Math.floor(app.screen.width / screenSquareSize);
+  let screenNumRows = Math.floor(app.screen.height / screenSquareSize);
+  screenSquareSize = Math.min(
+    app.screen.width / screenNumCols,
+    app.screen.height / screenNumRows
+  );
+  console.log(`${firstBaseTexture.width}x${firstBaseTexture.height}`, sourceSquareSize, '-', `${app.screen.width}x${app.screen.height}`, screenSquareSize);
 
-  const imgRowColPairs = Array.from(function* () {
-    for (let colIdx = 0; (colIdx+1)*squareRawSize < firstBaseTexture.width; colIdx++) {
-      for (let rowIdx = 0; (rowIdx+1)*squareRawSize < firstBaseTexture.height; rowIdx++) {
+  const sourceRowColPairs = Array.from(function* () {
+    for (let colIdx = 0; (colIdx+1)*sourceSquareSize < firstBaseTexture.width; colIdx++) {
+      for (let rowIdx = 0; (rowIdx+1)*sourceSquareSize < firstBaseTexture.height; rowIdx++) {
         yield [rowIdx, colIdx];
       }
     }
   }());
   const screenRowColPairs = Array.from(function* () {
-    for (let colIdx = 0; (colIdx+1)*squareSize < app.screen.width; colIdx++) {
-      for (let rowIdx = 0; (rowIdx+1)*squareSize < app.screen.height; rowIdx++) {
+    for (let colIdx = 0; (colIdx+1)*screenSquareSize < app.screen.width; colIdx++) {
+      for (let rowIdx = 0; (rowIdx+1)*screenSquareSize < app.screen.height; rowIdx++) {
         yield [rowIdx, colIdx];
       }
     }
   }());
   function getXYFromRowCol(row, col) {
-    return [0.5 * squareSize + col * squareSize, 0.5 * squareSize + row * squareSize];
+    return [0.5 * screenSquareSize + col * screenSquareSize, 0.5 * screenSquareSize + row * screenSquareSize];
   }
   const screenXYPairs = screenRowColPairs.map(([row,col]) => getXYFromRowCol(row, col));
   function getRowColFromXY(x, y) {
-    // TODO: should this limit to rows/cols that are fully shown (and not partially off the edge)?
-    x = _.clamp(x, 0, app.screen.width);
-    y = _.clamp(y, 0, app.screen.height);
-    return [Math.floor(y / squareSize), Math.floor(x / squareSize)];
+    x = _.clamp(x, 0, screenNumCols * screenSquareSize - 0.01);
+    y = _.clamp(y, 0, screenNumRows * screenSquareSize - 0.01);
+    return [Math.floor(y / screenSquareSize), Math.floor(x / screenSquareSize)];
   }
 
   // Initialize the squares:
   const squares = {}; window._d.squares = squares;
-  for (let [rowIdx, colIdx] of imgRowColPairs) {
+  for (let [rowIdx, colIdx] of sourceRowColPairs) {
     const squareID = getSquareID(rowIdx, colIdx);
 
     const textures = baseTextures.map(baseTexture => new PIXI.Texture(
       baseTexture,
-      new PIXI.Rectangle(colIdx*squareRawSize, rowIdx*squareRawSize, squareRawSize, squareRawSize)
+      new PIXI.Rectangle(colIdx*sourceSquareSize, rowIdx*sourceSquareSize, sourceSquareSize, sourceSquareSize)
     ));
     textures.push(...textures.slice().reverse());
 
     const square = new PIXI.AnimatedSprite(textures);
     square.squareID = squareID;
-    square.width = square.height = squareSize;
+    square.width = square.height = screenSquareSize;
     square.anchor.set(0.5);
     square.animationSpeed = 0.5;
     square.play();
@@ -157,7 +156,7 @@ app.loader.load(function() {
     // Check if this piece covers any other piece
     // TODO: Make this not be O(n^2).  Maybe make a set of occupied XY before iterating squareXYPairs.
     _.each(squares, sq => {
-      if (sq.squareID !== square.squareID && Math.abs(sq.x - square.x) < squareSize/4 && Math.abs(sq.y - square.y) < squareSize/4) {
+      if (sq.squareID !== square.squareID && Math.abs(sq.x - square.x) < screenSquareSize/4 && Math.abs(sq.y - square.y) < screenSquareSize/4) {
         // Find an empty spot
         for (let [x, y] of screenXYPairs.slice().reverse()) {
           if (!_.some(squares, s => s.x === x && s.y === y)) {
