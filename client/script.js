@@ -8,7 +8,7 @@
 // + When picking up a piece, also pick up correct neighbors (and their correct neighbors, etc)
 
 // LATER:
-// + Select a group of pieces to drag? Or glue aligned pieces so that they move together?
+// + When dragging a group of pieces, show a shadow behind them (but above non-held pieces)
 // + Let users upload images (perhaps with password required)
 // + Rotate pieces - Tap an edge to point it up? Drag a corner (shown on hover)? Drag across rotator-zone? Right-click? Shake? Two-finger? Or don't?
 // + Add sync?
@@ -81,6 +81,12 @@ app.loader.load(function() {
     return [0.5 * squareSize + col * squareSize, 0.5 * squareSize + row * squareSize];
   }
   const screenXYPairs = screenRowColPairs.map(([row,col]) => getXYFromRowCol(row, col));
+  function getRowColFromXY(x, y) {
+    // TODO: should this limit to rows/cols that are fully shown (and not partially off the edge)?
+    x = _.clamp(x, 0, app.screen.width);
+    y = _.clamp(y, 0, app.screen.height);
+    return [Math.floor(y / squareSize), Math.floor(x / squareSize)];
+  }
 
   // Initialize the squares:
   const squares = {}; window._d.squares = squares;
@@ -130,8 +136,7 @@ app.loader.load(function() {
       y: pointerPosition.y - this.position.y,
     };
     square.isDragging = true;
-    // Show this square above all other squares.  This requires 'this.parent.sortableChildren'.
-    square.zIndex = 1 + _.max(Object.values(squares).map(sq => sq.zIndex));
+    square.zIndex = 1; // Show this square above non-held squares.  This requires 'this.parent.sortableChildren'.
   }
   function onDragMove(event) {
     const square = this;
@@ -141,15 +146,14 @@ app.loader.load(function() {
         x: pointerPosition.x - this.dragStartOffset.x,
         y: pointerPosition.y - this.dragStartOffset.y
       };
-      squarePosition.x = _.clamp(squarePosition.x, 0, app.screen.width); //keep visible on screen
-      squarePosition.y = _.clamp(squarePosition.y, 0, app.screen.height);
-      [square.x, square.y] = getXYFromRowCol(Math.floor(squarePosition.y / squareSize), Math.floor(squarePosition.x / squareSize));
+      [square.x, square.y] = getXYFromRowCol(...getRowColFromXY(squarePosition.x, squarePosition.y));
     }
   }
   function onDragEnd() {
     const square = this;
     square.isDragging = false;
     square.dragStartOffset = undefined;
+    square.zIndex = 0;
     // Check if this piece covers any other piece
     // TODO: Make this not be O(n^2).  Maybe make a set of occupied XY before iterating squareXYPairs.
     _.each(squares, sq => {
