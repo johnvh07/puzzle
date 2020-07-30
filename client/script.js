@@ -4,7 +4,6 @@
 
 // TODO:
 // + `grid.setSquarePos(squareID, col, row)`, `grid.getSquare(col, row)`, `grid.size`
-// + Let user choose minNumPieces, either with `?pieces=500` in URL or with input box.
 // + When picking up a piece, also pick up correct neighbors (and their correct neighbors, etc)
 
 // LATER:
@@ -17,11 +16,25 @@
 
 window._d = window._d || {}; // for debugging in browser console
 
+function findGetParameter(parameterName) {
+  var result = null;
+  var tmp = [];
+  location.search
+    .substr(1)
+    .split("&")
+    .forEach(function (item) {
+      tmp = item.split("=");
+      if (tmp[0] === parameterName) { result = decodeURIComponent(tmp[1]); }
+    });
+  return result;
+}
+
 const squareIDRowMultiplier = 10000; // Never do a puzzle with 10001 or more columns
 const getSquareID = function(row, column) {
   return row * squareIDRowMultiplier + column;
 };
 
+const minNumPieces = +findGetParameter('pieces') || 100; console.log('Note: Try appending ?pieces=30 to URL');
 
 const app = new PIXI.Application({
   backgroundColor:0x444444,
@@ -41,7 +54,6 @@ app.loader.load(function() {
   // Define the grid:
   // `sourceSquareSize` is the width and height of the square extracted from the input image (which is stored in `baseTexture`)
   // `screenSquareSize` is the width and height of the square drawn into the <canvas> (which is accessed via `app.screen`)
-  const minNumPieces = 100;
   for(var sourceNumRows = 1;; sourceNumRows++) {
     var sourceSquareSize = Math.floor(firstBaseTexture.height / sourceNumRows);
     var sourceNumCols = Math.floor(firstBaseTexture.width / sourceSquareSize);
