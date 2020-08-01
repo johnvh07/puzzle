@@ -76,8 +76,8 @@ app.loader.load(function() {
   console.log(`${firstBaseTexture.width}x${firstBaseTexture.height}`, sourceSquareSize, '-', `${app.screen.width}x${app.screen.height}`, screenSquareSize);
 
   const sourceRowColPairs = Array.from(function* () {
-    for (let colIdx = 0; (colIdx+1)*sourceSquareSize < firstBaseTexture.width; colIdx++) {
-      for (let rowIdx = 0; (rowIdx+1)*sourceSquareSize < firstBaseTexture.height; rowIdx++) {
+    for (let colIdx = 0; colIdx < sourceNumCols; colIdx++) {
+      for (let rowIdx = 0; rowIdx < sourceNumRows; rowIdx++) {
         yield [rowIdx, colIdx];
       }
     }
