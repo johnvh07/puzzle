@@ -8,12 +8,13 @@
 <body>
   <form method="post" enctype="multipart/form-data">
     <p><input id="upload" type="file" accept="video/*"></input></p>
-    <p>Record this with the name: <input id="name" type="text"></input></p>
+    <p>Save this video with the name: <input id="name" type="text"></input></p>
     <p>
       Trim video to start at
       <input id="starttime" type="number" min="0" step="0.001" style="width:5em"></input> seconds and end at
       <input id="endtime" type="number" min="0" step="0.001" style="width:5em"></input> seconds.
     </p>
+    <p>The name of the street where our family home is: <input id="streetname" type="text"></input></p>
     <p><input type="submit" value="Upload!" formaction="http://puzzle.petervh.com/upload"></input></p>
   </form>
   <hr>
