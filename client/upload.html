@@ -6,26 +6,42 @@
   <title>Puzzle - Upload</title>
 </head>
 <body>
-  <input id="upload" type="file" accept="video/*"></input>
-  <p id="output"></p>
-  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.js"></script>
+  <form method="post" enctype="multipart/form-data">
+    <p><input id="upload" type="file" accept="video/*"></input></p>
+    <p>Record this with the name: <input id="name" type="text"></input></p>
+    <p>
+      Trim video to start at
+      <input id="starttime" type="number" min="0" step="0.001" style="width:5em"></input> seconds and end at
+      <input id="endtime" type="number" min="0" step="0.001" style="width:5em"></input> seconds.
+    </p>
+    <p><input type="submit" value="Upload!" formaction="http://puzzle.petervh.com/upload"></input></p>
+  </form>
+  <hr>
+  <video id="video" controls playsinline muted autoplay style="max-width:100%;display:none"></video>
+  <p id="video_info"></p>
+  <hr>
+  <p id="output" style="font-family:monospace"></p>
+  <p>Instructions for iOS live photos: Open the live photo in the Photos app, swipe to see options, and choose "bounce" mode to convert the live photo to a video before uploading here.  If your screen becomes dominated by the video while uploading, try rotating your phone.</p>
   <script>
+    document.querySelector('#starttime').value = 0;  // This value gets retained on reload, so set it to 0.
     document.querySelector('#upload').addEventListener('change', function() {
-      const filelist = this.files;
-      document.querySelector('#output').innerHTML = (
-        `number of files = ${filelist.length}<br>` +
-        [].map.call(
-          filelist,
-          (f,idx) => `files[${idx}] = {size:${f.size.toLocaleString()} bytes, type:${f.type}}`
-        ).join('<br>')
-      );
+      const filelist = [].slice.call(this.files);
+      window._d = {filelist};
+      document.querySelector('#output').innerHTML = filelist.map((f,idx) => `files[${idx}] = {size:${f.size.toLocaleString()} bytes, type:${f.type}}`).join('<br>');
       if (filelist.length === 1 && filelist[0].type.startsWith('video/')) {
-        const video_elem = document.createElement('video');
-        document.body.appendChild(video_elem);
+        document.querySelector('#name').value = /[^\.]+/.exec(filelist[0].name) || (Math.random()*1e6).toFixed(0);
+        const video_elem = document.querySelector('#video');
+        video_elem.style.display = 'inherit';
+        video_elem.volume = 0;
+        video_elem.addEventListener('timeupdate', () => {
+          document.querySelector('#video_info').innerHTML = `${video_elem.currentTime.toFixed(3)} / ${video_elem.duration.toFixed(3)}`
+        });
         const object_url = URL.createObjectURL(filelist[0]);
         video_elem.src = object_url;
-        video_elem.play();
-        URL.revokeObjectURL(object_url);
+        video_elem.addEventListener('loadedmetadata', () => {
+          document.querySelector('#endtime').value = video_elem.duration.toFixed(3);
+        })
+        setTimeout(() => URL.revokeObjectURL(object_url), 100);  // I think it's ok to revoke this after the video fully loads
       }
     });
   </script>
