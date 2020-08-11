@@ -7,15 +7,15 @@
 </head>
 <body>
   <form method="post" enctype="multipart/form-data">
-    <p><input id="upload" type="file" accept="video/*"></input></p>
-    <p>Save this video with the name: <input id="name" type="text"></input></p>
+    <p><input id="upload" name="video" type="file" accept="video/*"></input></p>
+    <p>Save this video with the name: <input id="filename" name="filename" type="text"></input></p>
     <p>
       Trim video to start at
-      <input id="starttime" type="number" min="0" step="0.001" style="width:5em"></input> seconds and end at
-      <input id="endtime" type="number" min="0" step="0.001" style="width:5em"></input> seconds.
+      <input id="starttime" name="starttime" type="number" min="0" step="0.001" style="width:5em"></input> seconds and end at
+      <input id="endtime" name="endtime" type="number" min="0" step="0.001" style="width:5em"></input> seconds.
     </p>
-    <p>The name of the street where our family home is: <input id="streetname" type="text"></input></p>
-    <p><input type="submit" value="Upload!" formaction="http://puzzle.petervh.com/upload"></input></p>
+    <p>The name of the street where our family home is: <input name="streetname" type="text"></input></p>
+    <p><input type="submit" value="Upload!" formaction="/upload"></input></p>
   </form>
   <hr>
   <video id="video" controls playsinline muted autoplay style="max-width:100%;display:none"></video>
@@ -30,7 +30,7 @@
       window._d = {filelist};
       document.querySelector('#output').innerHTML = filelist.map((f,idx) => `files[${idx}] = {size:${f.size.toLocaleString()} bytes, type:${f.type}}`).join('<br>');
       if (filelist.length === 1 && filelist[0].type.startsWith('video/')) {
-        document.querySelector('#name').value = /[^\.]+/.exec(filelist[0].name) || (Math.random()*1e6).toFixed(0);
+        document.querySelector('#filename').value = /[^\.]+/.exec(filelist[0].name) || (Math.random()*1e6).toFixed(0);
         const video_elem = document.querySelector('#video');
         video_elem.style.display = 'inherit';
         video_elem.volume = 0;
