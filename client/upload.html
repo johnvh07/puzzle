@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+  <title>Puzzle - Upload</title>
+</head>
+<body>
+  <input id="upload" type="file" accept="video/*"></input>
+  <p id="output"></p>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.js"></script>
+  <script>
+    document.querySelector('#upload').addEventListener('change', function() {
+      const filelist = this.files;
+      document.querySelector('#output').innerHTML = (
+        `number of files = ${filelist.length}<br>` +
+        [].map.call(
+          filelist,
+          (f,idx) => `files[${idx}] = {size:${f.size.toLocaleString()} bytes, type:${f.type}}`
+        ).join('<br>')
+      );
+      if (filelist.length === 1 && filelist[0].type.startsWith('video/')) {
+        const video_elem = document.createElement('video');
+        document.body.appendChild(video_elem);
+        const object_url = URL.createObjectURL(filelist[0]);
+        video_elem.src = object_url;
+        video_elem.play();
+        URL.revokeObjectURL(object_url);
+      }
+    });
+  </script>
+</body>
+</html>
