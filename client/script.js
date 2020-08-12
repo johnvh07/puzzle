@@ -266,7 +266,7 @@ app.loader.load(function() {
         const screenRowCol = getScreenRowColFromXY(sq.x, sq.y);
         const positionID = getSquareID(...screenRowCol);
         return clobberedPositions.includes(positionID);
-      })
+      });
       // console.log('groundOccupiedPositions =', _.sortBy(groundOccupiedPositions));
       // console.log('airOccupiedPositions =', _.sortBy(airOccupiedPositions));
       // console.log('clobberedPositions =', _.sortBy(clobberedPositions));
