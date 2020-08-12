@@ -1,0 +1,20 @@
+# Sample commands to use:
+#   sudo systemctl daemon-reload  # makes systemd notice changes to this file
+#   sudo systemctl enable <service>  # run once (re-running is fine) so that systemd knows to run this when the system starts
+#   sudo systemctl start <service>
+#   sudo systemctl restart <service>
+#   sudo systemctl status -n30 <service>
+
+[Unit]
+Description=serves a live puzzle website
+After=network.target
+
+[Service]
+User=nobody
+Group=nogroup
+WorkingDirectory=/srv/puzzle/puzzle/server
+ExecStart=/srv/puzzle/puzzle/server/venv/bin/gunicorn serve:app --bind 127.0.0.1:8003 --access-logfile -
+# Restart=always
+
+[Install]
+WantedBy=multi-user.target
