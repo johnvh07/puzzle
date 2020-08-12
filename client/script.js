@@ -102,8 +102,8 @@ app.loader.load(function() {
     }
   }());
   const screenRowColPairs = Array.from(function* () {
-    for (let colIdx = 0; (colIdx+1)*screenSquareSize < app.screen.width; colIdx++) {
-      for (let rowIdx = 0; (rowIdx+1)*screenSquareSize < app.screen.height; rowIdx++) {
+    for (let colIdx = 0; (colIdx+1)*screenSquareSize <= app.screen.width; colIdx++) {
+      for (let rowIdx = 0; (rowIdx+1)*screenSquareSize <= app.screen.height; rowIdx++) {
         yield [rowIdx, colIdx];
       }
     }
