@@ -3,6 +3,7 @@
 // Note: the image must be served via http* (not file://) due to CORS.
 
 // TODO:
+// + Add a GET param to choose the image, like /index.html?image=hex , and get the number of images from https://petervh.com/live/<image>/info.json
 // + Reactive-zoom the screen upon drop to always have 0.5 row/col empty on all sides (and allow dragging into that half row/col)
 //   + Should we change the x/y of every piece when this happens?  Or should we have 3 coordinate systems: SourceXY, StageXY, ScreenXY?
 //     + Rendering will use ScreenXY, clobbering will use StageXY, glueing will use SourceRowCol+StageRowCol, dragging will be a mess.
@@ -61,7 +62,7 @@ const app = new PIXI.Application({
 _d.app = app;
 app.stage.sortableChildren = true; // required for zIndex to have any effect
 document.body.appendChild(app.view);
-const imgPaths = _.range(1, 1+47).map(i => `https://petervh.com/viv-frames/${i}.jpg`);
+const imgPaths = _.range(1, 1+47).map(i => `https://petervh.com/live/viv-slide/${i}.jpg`);
 
 imgPaths.forEach(imgPath => app.loader.add(imgPath));
 app.loader.load(function() {
