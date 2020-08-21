@@ -9,7 +9,14 @@
 //     + Rendering will use ScreenXY, clobbering will use StageXY, glueing will use SourceRowCol+StageRowCol, dragging will be a mess.
 // + On drop, save the state into localStorage.
 //   + Should serialization/deserialization be special functions?  Or should the entire state pass through an easily-serializable format, like cardtable does?
+//     + The difficulty with this is that we have to create the baseTextures.
+//       + What if I had a memoized getBaseTextureForURL(url) and getTexture(url, x,y,width,height)? (beware Pixi GC)
 //   + Add a dropdown-menu at the top-left with "Restart".
+// + Send video from server -> client more efficiently.  viv-slide is 800KB as mov and 10MB as 47 jpgs.
+//   + We cannot play from a <video> because that can't reverse-play the bounce and encoding the bounce into the video will double size.
+//   + Option 1: jsmpeg (or other js video decoder) to convert mpeg->frames (maybe 100fps?)
+//   + Option 2: use <video> & <canvas> to convert video -> frames (at what speed? realtime?)
+//   + Option 3: some other compression method
 
 // LATER:
 // + `grid.setSquarePos(squareID, col, row)`, `grid.getSquare(col, row)`, `grid.size`? with separate groundedGrid vs heldGrid?

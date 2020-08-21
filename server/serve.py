@@ -63,9 +63,10 @@ def upload_file():
         ffmpeg_stdout = subprocess.check_output([
             '/usr/bin/ffmpeg',
             '-i', os.path.join(app.config['UPLOAD_DIR'], filename),
+            '-an',  # remove audio
             '-ss', str(float(request.form.to_dict()['starttime'])),
             '-to', str(float(request.form.to_dict()['endtime'])),
-            '-qscale:v', '2',
+            '-qscale:v', '2',  # quality scales from 1=best to 31=worst
             os.path.join(app.config['SERVE_DIR'], filename, '%d.jpg')
         ], stderr=subprocess.STDOUT)
         print(f'{ffmpeg_stdout=}')
