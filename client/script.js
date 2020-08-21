@@ -66,7 +66,7 @@ const app = new PIXI.Application({
   backgroundColor:0x444444,
   width:window.innerWidth - 3, height:window.innerHeight - 10,
 });
-_d.app = app;
+window._d.app = app;
 app.stage.sortableChildren = true; // required for zIndex to have any effect
 document.body.appendChild(app.view);
 const imgPaths = _.range(1, 1+47).map(i => `https://petervh.com/live/viv-slide/${i}.jpg`);
