@@ -71,6 +71,18 @@ def upload_file():
         ], stderr=subprocess.STDOUT)
         print(f'{ffmpeg_stdout=}')
 
+        ffmpeg_stdout = subprocess.check_output([
+            '/usr/bin/ffmpeg',
+            '-i', os.path.join(app.config['UPLOAD_DIR'], filename),
+            '-an',  # remove audio
+            '-ss', str(float(request.form.to_dict()['starttime'])),
+            '-to', str(float(request.form.to_dict()['endtime'])),
+            '-f', 'mpegts', -'codec:v', 'mpeg1video',
+            '-b:v', '11M',  # this bitrate (~1.4MB/s) is a decent size and quality
+            os.path.join(app.config['SERVE_DIR'], filename+'.ts',)
+        ], stderr=subprocess.STDOUT)
+        print(f'{ffmpeg_stdout=}')
+
         max_filenum = max(int(fname.split('.')[0]) for fname in os.listdir(os.path.join(app.config['SERVE_DIR'], filename)))
         with open(os.path.join(app.config['SERVE_DIR'], filename, 'info.json'), 'w') as f: json.dump({'max_filenum':max_filenum}, f)
 
