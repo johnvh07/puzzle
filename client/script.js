@@ -61,6 +61,7 @@ const getSourceRowCol = _.memoize(function(squareID) {
 });
 
 const minNumPieces = +findGetParameter('pieces') || 100; console.log('Note: Try appending ?pieces=30 to URL');
+const imageName = findGetParameter('image') || 'viv-slide'; console.log('Note: Try appending ?image=hex to URL');
 
 const app = new PIXI.Application({
   backgroundColor:0x444444,
@@ -69,7 +70,7 @@ const app = new PIXI.Application({
 window._d.app = app;
 app.stage.sortableChildren = true; // required for zIndex to have any effect
 document.body.appendChild(app.view);
-const imgPaths = _.range(1, 1+47).map(i => `https://petervh.com/live/viv-slide/${i}.jpg`);
+const imgPaths = _.range(1, 1+47).map(i => `https://petervh.com/live/${imageName}/${i}.jpg`);
 
 imgPaths.forEach(imgPath => app.loader.add(imgPath));
 app.loader.load(function() {
