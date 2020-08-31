@@ -15,6 +15,8 @@
 // + Send video from server -> client more efficiently.  viv-slide is 800KB as mov and 10MB as 47 jpgs.
 //   + We cannot play from a <video> because that can't reverse-play the bounce and encoding the bounce into the video will double size.
 //   + Option 1: jsmpeg (or other js video decoder) to convert mpeg->frames (maybe 100fps?)
+//     + On DSL, the decoder is fast and the 2MB download is slow.  Can we build the puzzle when the first frame decodes and iteratively add more frames?
+//       + Just modify animatedSprite.textures (see https://www.html5gamedevs.com/topic/28818-how-to-update-texture-for-animatedsprite/)
 //   + Option 2: use <video> & <canvas> to convert video -> frames (at what speed? realtime?)
 //   + Option 3: some other compression method
 

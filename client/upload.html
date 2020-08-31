@@ -12,7 +12,7 @@
     <p>
       Trim video to start at
       <input id="starttime" name="starttime" type="number" min="0" step="0.001" style="width:5em"></input> seconds and end at
-      <input id="endtime" name="endtime" type="number" min="0" step="0.001" style="width:5em"></input> seconds.
+      <input id="endtime" name="endtime" type="number" min="0" step="0.001" style="width:5em"></input> seconds.  (1-2 second videos are best.)
     </p>
     <p>The name of the street where our family home is: <input name="streetname" type="text"></input></p>
     <p><input type="submit" value="Upload!" formaction="/upload"></input></p>
@@ -22,7 +22,8 @@
   <p id="video_info"></p>
   <hr>
   <p id="output" style="font-family:monospace"></p>
-  <p>Instructions for iOS live photos: Open the live photo in the Photos app, swipe to see options, and choose "bounce" mode to convert the live photo to a video before uploading here.  If your screen becomes dominated by the video while uploading, try rotating your phone.</p>
+  <p>Instructions for iPhone live photos: Open the live photo in the Photos app, swipe to see options, and choose "bounce" mode to convert the live photo to a video before uploading here.  If your screen becomes dominated by the video while uploading, try rotating your phone.</p>
+  <p>Instructions for Macbook live photos: Open the live photo in the Photos app, and click File -&gt; Export -&gt; "Export Original" and click "Export", which should put a ".mov" movie on your Desktop.</p>
   <script>
     document.querySelector('#starttime').value = 0;  // This value gets retained on reload, so set it to 0.
     document.querySelector('#upload').addEventListener('change', function() {
