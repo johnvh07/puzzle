@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-from flask import Flask, request, abort, Response, send_file, send_from_directory, url_for, redirect
+from flask import Flask, request, abort, Response, send_file, send_from_directory, url_for, redirect, jsonify
 from werkzeug.utils import secure_filename
 import boltons.fileutils
 import os, random, pathlib, subprocess, json
+from pathlib import Path
 
 
 app = Flask(__name__)
@@ -25,6 +26,11 @@ def homepage():
 @app.route('/<path:path>')
 def serve_client_path(path):
     return send_from_directory(pathlib.Path().absolute().parent / 'client', path)
+
+@app.route('/all-images')
+def all_images():
+    images = [c.name for c in Path(app.config['SERVE_DIR']).iterdir() if c.is_dir()]
+    return jsonify(images)
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
