@@ -7,12 +7,12 @@ import os, random, pathlib, subprocess, json
 
 
 app = Flask(__name__)
-app.config['UPLOAD_DIR'] = '/tmp/livepuzzle-uploads'
-app.config['TRIMMED_DIR'] = '/tmp/livepuzzle-trimmed'
-app.config['SERVE_DIR'] = '/var/www/html/live/'
+app.config['UPLOAD_DIR'] = './livepuzzle-uploads/'; boltons.fileutils.mkdir_p(app.config['UPLOAD_DIR'])
+app.config['SERVE_DIR'] = '/var/www/html/live/'; boltons.fileutils.mkdir_p(app.config['SERVE_DIR'])
 app.config['MAX_CONTENT_LENGTH'] = 100*1024*1024  # 100MB max upload
 
 secret_password = pathlib.Path('secret.txt').read_text().strip()
+
 
 def get_free_space():
     statvfs = os.statvfs(app.config['UPLOAD_DIR'])
@@ -52,13 +52,10 @@ def upload_file():
             abort(Response('This request didnt include any real files.', 404))
 
         filename = secure_filename(request.form.to_dict()['filename'])
-        boltons.fileutils.mkdir_p(app.config['UPLOAD_DIR'])
         while os.path.exists(os.path.join(app.config['UPLOAD_DIR'], filename)): filename += random.choice('123456789')
-        while os.path.exists(os.path.join(app.config['TRIMMED_DIR'], filename)): filename += random.choice('123456789')
         while os.path.exists(os.path.join(app.config['SERVE_DIR'], filename)): filename += random.choice('123456789')
         file.save(os.path.join(app.config['UPLOAD_DIR'], filename))
 
-        boltons.fileutils.mkdir_p(app.config['UPLOAD_DIR'])
         boltons.fileutils.mkdir_p(os.path.join(app.config['SERVE_DIR'], filename))
         ffmpeg_stdout = subprocess.check_output([
             '/usr/bin/ffmpeg',
@@ -71,17 +68,18 @@ def upload_file():
         ], stderr=subprocess.STDOUT)
         print(f'{ffmpeg_stdout=}')
 
-        ffmpeg_stdout = subprocess.check_output([
-            '/usr/bin/ffmpeg',
-            '-i', os.path.join(app.config['UPLOAD_DIR'], filename),
-            '-an',  # remove audio
-            '-ss', str(float(request.form.to_dict()['starttime'])),
-            '-to', str(float(request.form.to_dict()['endtime'])),
-            '-f', 'mpegts', -'codec:v', 'mpeg1video',
-            '-b:v', '11M',  # this bitrate (~1.4MB/s) is a decent size and quality
-            os.path.join(app.config['SERVE_DIR'], filename+'.ts',)
-        ], stderr=subprocess.STDOUT)
-        print(f'{ffmpeg_stdout=}')
+        # I'm commenting this out for now because sometimes it breaks with the error message "MPEG-1/2 does not support 15/1 fps", and anyways mpegts is too inefficient
+        #ffmpeg_stdout = subprocess.check_output([
+        #    '/usr/bin/ffmpeg',
+        #    '-i', os.path.join(app.config['UPLOAD_DIR'], filename),
+        #    '-an',  # remove audio
+        #    '-ss', str(float(request.form.to_dict()['starttime'])),
+        #    '-to', str(float(request.form.to_dict()['endtime'])),
+        #    '-f', 'mpegts', '-codec:v', 'mpeg1video',
+        #    '-b:v', '11M',  # this bitrate (~1.4MB/s) is a decent size and quality
+        #    os.path.join(app.config['SERVE_DIR'], filename+'.ts',)
+        #], stderr=subprocess.STDOUT)
+        #print(f'{ffmpeg_stdout=}')
 
         max_filenum = max(int(fname.split('.')[0]) for fname in os.listdir(os.path.join(app.config['SERVE_DIR'], filename)))
         with open(os.path.join(app.config['SERVE_DIR'], filename, 'info.json'), 'w') as f: json.dump({'max_filenum':max_filenum}, f)
