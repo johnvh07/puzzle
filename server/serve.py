@@ -29,8 +29,8 @@ def serve_client_path(path):
 
 @app.route('/all-images')
 def all_images():
-    images = [c.name for c in Path(app.config['SERVE_DIR']).iterdir() if c.is_dir()]
-    return jsonify(images)
+    images = sorted(c.name for c in Path(app.config['SERVE_DIR']).iterdir() if c.is_dir() and not c.is_symlink())
+    return '\n'.join(f'<p><a href="/?image={image}">{image}</a></p>' for image in images)
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
@@ -90,4 +90,4 @@ def upload_file():
         max_filenum = max(int(fname.split('.')[0]) for fname in os.listdir(os.path.join(app.config['SERVE_DIR'], filename)))
         with open(os.path.join(app.config['SERVE_DIR'], filename, 'info.json'), 'w') as f: json.dump({'max_filenum':max_filenum}, f)
 
-        return f'Saved as {filename}'
+        return f'Saved as <a href="/?image={filename}">{filename}</a>'
