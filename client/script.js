@@ -1,31 +1,7 @@
 /* global PIXI, _ */
 
 // Note: the image must be served via http* (not file://) due to CORS.
-
-// TODO:
-// + Add a GET param to choose the image, like /index.html?image=hex , and get the number of images from https://petervh.com/live/<image>/info.json
-// + Reactive-zoom the screen upon drop to always have 0.5 row/col empty on all sides (and allow dragging into that half row/col)
-//   + Should we change the x/y of every piece when this happens?  Or should we have 3 coordinate systems: SourceXY, StageXY, ScreenXY?
-//     + Rendering will use ScreenXY, clobbering will use StageXY, glueing will use SourceRowCol+StageRowCol, dragging will be a mess.
-// + On drop, save the state into localStorage.
-//   + Should serialization/deserialization be special functions?  Or should the entire state pass through an easily-serializable format, like cardtable does?
-//     + The difficulty with this is that we have to create the baseTextures.
-//       + What if I had a memoized getBaseTextureForURL(url) and getTexture(url, x,y,width,height)? (beware Pixi GC)
-//   + Add a dropdown-menu at the top-left with "Restart".
-// + Send video from server -> client more efficiently.  viv-slide is 800KB as mov and 10MB as 47 jpgs.
-//   + We cannot play from a <video> because that can't reverse-play the bounce and encoding the bounce into the video will double size.
-//   + Option 1: jsmpeg (or other js video decoder) to convert mpeg->frames (maybe 100fps?)
-//     + On DSL, the decoder is fast and the 2MB download is slow.  Can we build the puzzle when the first frame decodes and iteratively add more frames?
-//       + Just modify animatedSprite.textures (see https://www.html5gamedevs.com/topic/28818-how-to-update-texture-for-animatedsprite/)
-//   + Option 2: use <video> & <canvas> to convert video -> frames (at what speed? realtime?)
-//   + Option 3: some other compression method
-
-// LATER:
-// + `grid.setSquarePos(squareID, col, row)`, `grid.getSquare(col, row)`, `grid.size`? with separate groundedGrid vs heldGrid?
-// + When dragging a group of pieces, show a shadow behind them (but above non-held pieces)
-// + Rotate pieces - Tap an edge to point it up? Drag a corner (shown on hover)? Drag across rotator-zone? Right-click? Shake? Two-finger? Or don't?
-// + Show rectangles instead of squares to fill the screen?
-
+// Note: TODOs in README
 
 window._d = window._d || {}; // for debugging in browser console
 
