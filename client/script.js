@@ -264,7 +264,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           // console.log('occupiedPositions =', _.sortBy(occupiedPositions));
           // console.log('allPositions =', _.sortBy(allPositions));
           // console.log('emptyPositions =', _.sortBy(emptyPositions));
-          clobberedSquares.forEach(sq => {
+          _.shuffle(clobberedSquares).forEach(sq => {
             const newPosition = emptyPositions.pop();
             const newXY = getScreenXYFromRowCol(...getSourceRowCol(newPosition));
             // console.log(`moving clobbered sq from ${sq.x},${sq.y} -> ${newXY[0]},${newXY[1]}`);
