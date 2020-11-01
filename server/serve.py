@@ -27,6 +27,7 @@ def homepage():
 def serve_client_path(path):
     return send_from_directory(pathlib.Path().absolute().parent / 'client', path)
 
+@app.route('/all')
 @app.route('/all-images')
 def all_images():
     images = sorted(c.name for c in Path(app.config['SERVE_DIR']).iterdir() if c.is_dir() and not c.is_symlink())
