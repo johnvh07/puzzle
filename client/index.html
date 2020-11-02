@@ -12,10 +12,22 @@
   </style>
 </head>
 <body>
-  <!-- <img src="lily.jpg" style="width:30%"> -->
+    <div id='grid'></div>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.3.3/pixi.min.js"></script>
-  <script src="script.js"></script>
+  <script
+  src="https://code.jquery.com/jquery-3.5.1.min.js"
+  integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+  crossorigin="anonymous"></script>
+  <script>
+fetch(`https://petervh.com/live/info.json`)
+  .then(response => response.json())
+  .then( function(data){
+      data.forEach( function(item ,index){
+          let tile = '<div><h3>' + item.name + '</h3><img alt="preview of puzzle named' + item.name + '" src="' + item.thumbnail_url + '"width="30%"><div><a href="puzzle.html?image=' + item.name + '&pieces=25">25 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=100">100 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=400">400 piece</a></div></div>';
+        $('div#grid').append(tile);
+      });
+  });
+
+  </script>
 </body>
 </html>
-
