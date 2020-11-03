@@ -14,7 +14,7 @@ def encode_video(filename):
     end_seconds = upload_info['end_seconds']
     serve_subdir_path = (serve_dir_path / filename)  # TODO: name better
     if serve_subdir_path.exists():
-        print(f'Deleteing existing directory {serve_subdir_path}')
+        print(f'Deleting existing directory {serve_subdir_path}')
         shutil.rmtree(serve_subdir_path)
     serve_subdir_path.mkdir()
 
