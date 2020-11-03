@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 
 import json
-from pathlib import Path
 
+from config import serve_dir_path
 
-def generate_shared_info_json(serve_dir):
+def make_shared_info_json():
     ret = []
-    for dirpath in Path(serve_dir).iterdir():
+    for dirpath in serve_dir_path.iterdir():
         if dirpath.is_dir():
             j = json.loads((dirpath / 'info.json').read_text())
             j['name'] = dirpath.name
-            j['thumbnail_url'] = f'https://petervh.com/live/{dirpath.name}/1.jpg'
+            if '320px_mp4' in j: j['320px_mp4'] = f"https://petervh.com/live/{dirpath.name}/{j['320px_mp4']}"
+            if '320px_jpg' in j: j['320px_jpg'] = f"https://petervh.com/live/{dirpath.name}/{j['320px_jpg']}"
             ret.append(j)
-    shared_info_json_path = Path(serve_dir) / 'info.json'
-    shared_info_json_path.write_text(json.dumps(ret))
+    (serve_dir_path / 'info.json').write_text(json.dumps(ret))
 
 
 if __name__ == '__main__':
-    generate_shared_info_json('/var/www/html/live/')
+    make_shared_info_json()
