@@ -1,3 +1,4 @@
 venv
 secret.txt
 server/livepuzzle-uploads
+settings.json

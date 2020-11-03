@@ -10,4 +10,4 @@ serve_dir_path = Path('/var/www/html/live')
 serve_dir_path.mkdir(parents=True, exist_ok=True)
 if serve_dir_path.stat().st_mode & 0o777 != 0o777: serve_dir_path.chmod(0o777)
 
-hosting_base_url = 'https://petervh.com/live/'
+hosting_base_url = 'https://petervh.com/live'

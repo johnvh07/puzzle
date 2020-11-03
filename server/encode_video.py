@@ -8,6 +8,7 @@ from make_shared_info_json import make_shared_info_json
 
 def encode_video(filename):
     upload_filepath = upload_dir_path / filename
+    assert upload_filepath.is_file()
     upload_info = json.loads((upload_dir_path / f'{filename}.json').read_text())
     start_seconds = upload_info['start_seconds']
     end_seconds = upload_info['end_seconds']
@@ -22,31 +23,30 @@ def encode_video(filename):
         '-an',  # remove audio
         '-ss', str(start_seconds), '-to', str(end_seconds),
         '-qscale:v', '2',  # quality scales from 1=best to 31=worst
-        str(serve_dir_path / filename / '%d.jpg')
+        str(serve_subdir_path / '%d.jpg')
     ]
     print(f'ffmpeg_argv = {argv}')
     ffmpeg_proc = subprocess.run(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-    if ffmpeg_proc.returncode != 0:
-        print('FFMPEG ERROR:')
-        print(ffmpeg_proc.stdout)
-        print('===')
-        ffmpeg_proc.check_returncode()
-    max_filenum = max(int(prefix) for img_path in (serve_dir_path / filename).iterdir() if (prefix := img_path.name.split('.')[0]).isdigit())
+    print('FFMPEG OUTPUT:')
+    print(ffmpeg_proc.stdout)
+    print('===')
+    ffmpeg_proc.check_returncode()
+    max_filenum = max(int(prefix) for img_path in serve_subdir_path.iterdir() if (prefix := img_path.name.split('.')[0]).isdigit())
 
     argv = [
-        '/usr/bin/ffmpeg', '-i', str(upload_filepath),  # Consider using 1.jpg as input instead
+        '/usr/bin/ffmpeg', '-i', str(upload_filepath),
         '-an',  # remove audio
-        '-ss', str(start_seconds), '-to', str(end_seconds),
-        '-vf', 'select=eq(n\\,0),scale=320:-1',  # only first frame, 320px wide
-        str(serve_dir_path / filename / '320px.jpg')
+        '-ss', str(start_seconds),
+        '-vframes', '1',  # only 1 frame
+        '-vf', 'scale=320:-1',  # 320px wide
+        str(serve_subdir_path / '320px.jpg')
     ]
     print(f'ffmpeg_argv = {argv}')
     ffmpeg_proc = subprocess.run(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-    if ffmpeg_proc.returncode != 0:
-        print('FFMPEG ERROR:')
-        print(ffmpeg_proc.stdout)
-        print('===')
-        ffmpeg_proc.check_returncode()
+    print('FFMPEG OUTPUT:')
+    print(ffmpeg_proc.stdout)
+    print('===')
+    ffmpeg_proc.check_returncode()
 
     argv = [
         '/usr/bin/ffmpeg', '-i', str(upload_filepath),
@@ -54,17 +54,16 @@ def encode_video(filename):
         '-ss', str(start_seconds), '-to', str(end_seconds),
         '-vf','fps=10,scale=320:-2',  # 10fps, 320px wide (the `-2` makes height an even number, which mp4 needs)
         '-loop', '0',  # loop forever
-        str(serve_dir_path / filename / '320px.mp4')
+        str(serve_subdir_path / '320px.mp4')
     ]
     print(f'ffmpeg_argv = {argv}')
     ffmpeg_proc = subprocess.run(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-    if ffmpeg_proc.returncode != 0:
-        print('FFMPEG ERROR:')
-        print(ffmpeg_proc.stdout)
-        print('===')
-        ffmpeg_proc.check_returncode()
+    print('FFMPEG OUTPUT:')
+    print(ffmpeg_proc.stdout)
+    print('===')
+    ffmpeg_proc.check_returncode()
 
-    (serve_dir_path / filename / 'info.json').write_text(json.dumps({
+    (serve_subdir_path / 'info.json').write_text(json.dumps({
         'max_filenum': max_filenum,
         '320px_jpg': f'{hosting_base_url}/{filename}/320px.jpg',
         '320px_mp4': f'{hosting_base_url}/{filename}/320px.mp4',
