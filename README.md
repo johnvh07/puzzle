@@ -1,3 +1,8 @@
+# TODO for index:
+
+- Make a 200x200 thumbnail for each puzzle and use it in the shared `info.json`.
+
+
 # TODO for upload:
 
 - Don't allow videos longer than 2 seconds.
@@ -32,6 +37,8 @@
     - look into bellard's BPG: https://bellard.org/bpg/animation.html
   - Option 2: use `<video>` & `<canvas>` to convert video -> frames (at what speed? realtime?)
   - Option 3: some other compression method
+
+- Allow adding a border with `&border=true`
 
 
 # CONSIDER-TODO for puzzle:
