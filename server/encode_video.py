@@ -22,6 +22,7 @@ def encode_video(filename):
         '/usr/bin/ffmpeg', '-i', str(upload_filepath),
         '-an',  # remove audio
         '-ss', str(start_seconds), '-to', str(end_seconds),
+        '-vf', 'fps=fps=30',
         '-qscale:v', '2',  # quality scales from 1=best to 31=worst
         str(serve_subdir_path / '%d.jpg')
     ]
