@@ -16,13 +16,34 @@
     }
     .grid-cell {
       padding: 10px;
-      flex: 30%;
+    /*6 column*/
+      flex: 14%;
     }
+    /*5 column*/
+    @media (max-width: 2100px) {
+      .grid-cell {
+        flex: 19%;
+      }
+    }
+    /*4 column*/
+    @media (max-width: 1600px) {
+      .grid-cell {
+        flex: 25%;
+      }
+    }
+    /*3 column*/
+    @media (max-width: 1200px) {
+      .grid-cell {
+        flex: 30%;
+      }
+    }
+    /*2 column*/
     @media (max-width: 900px) {
       .grid-cell {
         flex: 45%;
       }
     }
+    /*1 column*/
     @media (max-width: 500px) {
       .grid-cell {
         flex: 100%;
