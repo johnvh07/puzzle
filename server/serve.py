@@ -23,6 +23,10 @@ def get_free_space():
 def homepage():
     return send_file(pathlib.Path().absolute().parent / 'client' / 'index.html')
 
+@app.route('/upload.html')
+def upload_redirect():
+    return redirect(url_for('upload_file'))
+
 @app.route('/<path:path>')
 def serve_client_path(path):
     return send_from_directory(pathlib.Path().absolute().parent / 'client', path)
@@ -93,7 +97,7 @@ def upload_file():
 
         generate_shared_info_json()
 
-        return f'Saved as <a href="/?image={filename}">{filename}</a>'
+        return f'Saved as <a href="/puzzle.html?image={filename}">{filename}</a>'
 
 
 def generate_shared_info_json():
