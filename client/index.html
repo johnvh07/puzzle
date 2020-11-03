@@ -92,8 +92,9 @@ fetch(`https://petervh.com/live/info.json`)
   .then(response => response.json())
   .then( function(data){
       data.forEach( function(item ,index){
-          let tile = '<div class="grid-cell"><h3>' + item.name + '</h3><img alt="preview of puzzle named' + item.name + '" src="' + item.thumbnail_url + '"><div><a href="puzzle.html?image=' + item.name + '&pieces=25">25 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=100">100 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=400">400 piece</a></div></div>';
-        $('div#grid').append(tile);
+          let thumbnail_url = item['320px_jpg'] || 'https://petervh.com/live/'+item.name+'/1.jpg';
+          let tile = '<div class="grid-cell"><h3>' + item.name + '</h3><img alt="preview of puzzle named' + item.name + '" src="' + thumbnail_url + '"><div><a href="puzzle.html?image=' + item.name + '&pieces=25">25 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=100">100 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=400">400 piece</a></div></div>';
+          $('div#grid').append(tile);
       });
   });
 
