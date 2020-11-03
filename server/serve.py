@@ -6,6 +6,7 @@ import boltons.fileutils
 import os, random, pathlib, subprocess, json
 from pathlib import Path
 
+from make_shared_info_json import generate_shared_info_json
 
 app = Flask(__name__)
 app.config['UPLOAD_DIR'] = './livepuzzle-uploads/'; boltons.fileutils.mkdir_p(app.config['UPLOAD_DIR'])
@@ -22,6 +23,10 @@ def get_free_space():
 @app.route('/')
 def homepage():
     return send_file(pathlib.Path().absolute().parent / 'client' / 'index.html')
+
+@app.route('/upload.html')
+def upload_redirect():
+    return redirect(url_for('upload_file'))
 
 @app.route('/<path:path>')
 def serve_client_path(path):
@@ -91,18 +96,6 @@ def upload_file():
         max_filenum = max(int(fname.split('.')[0]) for fname in os.listdir(os.path.join(app.config['SERVE_DIR'], filename)))
         with open(os.path.join(app.config['SERVE_DIR'], filename, 'info.json'), 'w') as f: json.dump({'max_filenum':max_filenum}, f)
 
-        generate_shared_info_json()
+        generate_shared_info_json(app.config['SERVE_DIR'])
 
-        return f'Saved as <a href="/?image={filename}">{filename}</a>'
-
-
-def generate_shared_info_json():
-    ret = []
-    for dirpath in Path(app.config['SERVE_DIR']).iterdir():
-        if dirpath.is_dir():
-            j = json.loads((dirpath / 'info.json').read_text())
-            j['name'] = dirpath.name
-            j['thumbnail_url'] = f'https://petervh.com/live/{dirpath.name}/1.jpg'
-            ret.append(j)
-    shared_info_json_path = Path(app.config['SERVE_DIR']) / 'info.json'
-    shared_info_json_path.write_text(json.dumps(ret))
+        return f'Saved as <a href="/puzzle.html?image={filename}">{filename}</a>'
