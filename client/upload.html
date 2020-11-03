@@ -11,8 +11,8 @@
     <p>Save this video with the name: <input id="filename" name="filename" type="text"></input></p>
     <p>
       Trim video to start at
-      <input id="starttime" name="starttime" type="number" min="0" step="0.001" style="width:5em"></input> seconds and end at
-      <input id="endtime" name="endtime" type="number" min="0" step="0.001" style="width:5em"></input> seconds.  (1-2 second videos are best.)
+      <input id="starttime" name="starttime" type="number" min="0" step="0.1" style="width:5em"></input> seconds and end at
+      <input id="endtime" name="endtime" type="number" min="0" step="0.1" style="width:5em"></input> seconds.  (1-2 second videos are best.)
     </p>
     <p>The name of the street where our family home is: <input name="streetname" type="text"></input></p>
     <p><input type="submit" value="Upload!" formaction="/upload"></input></p>
@@ -46,6 +46,9 @@
         setTimeout(() => URL.revokeObjectURL(object_url), 100);  // I think it's ok to revoke this after the video fully loads
       }
     });
+    if (window.location.host == "johnvh07.github.io") {
+      alert("wrong host need peters host");
+    } else { console.log(window.location.host);}
   </script>
 </body>
 </html>
