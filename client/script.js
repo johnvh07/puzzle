@@ -63,21 +63,33 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
       // Define the grid:
       // `sourceSquareSize` is the width and height of the square extracted from the input image (which is stored in `baseTexture`)
       // `screenSquareSize` is the width and height of the square drawn into the <canvas> (which is accessed via `app.screen`)
+      // Define sourceSquareSize by finding the number of rows needed to get at least minNumPieces.
       for(var sourceNumRows = 1;; sourceNumRows++) {
         var sourceSquareSize = Math.floor(firstBaseTexture.height / sourceNumRows);
         var sourceNumCols = Math.floor(firstBaseTexture.width / sourceSquareSize);
         const numPieces = sourceNumRows * sourceNumCols;
-        if (numPieces > minNumPieces) {
+        if (numPieces >= minNumPieces) {
           break;
         }
       }
-      let screenSquareSize = app.screen.height / sourceNumRows;
-      if (screenSquareSize * sourceNumCols > app.screen.width) {
-        screenSquareSize = Math.floor(app.screen.width / sourceNumCols);
+      // Set screenSquareSize to make the puzzle fit nicely on the screen
+      const numOccupiedCells = sourceNumRows * sourceNumCols;
+      let screenSquareSize = Math.min(
+        app.screen.height / sourceNumRows,  // size to fit height
+        app.screen.width / sourceNumCols,  // size to fit width
+        Math.sqrt(app.screen.height * app.screen.width / numOccupiedCells * 0.66),  // size to use only 2/3 of the screen
+      );
+      // Iteratively shrink screenSquareSize until 2/3 (or less) of cells are occupied
+      while (1) {
+        const totalNumCells = Math.floor(app.screen.width / screenSquareSize) * Math.floor(app.screen.height / screenSquareSize);
+        if (numOccupiedCells / totalNumCells < 0.66) {
+          break;
+        }
+        screenSquareSize *= 0.99;
       }
-      screenSquareSize *= 0.85; // shrink pieces a little to leave empty workspace
-      let screenNumCols = Math.floor(app.screen.width / screenSquareSize);
-      let screenNumRows = Math.floor(app.screen.height / screenSquareSize);
+      // Grow screenSquareSize a bit so that some row or column will perfectly hit the edge of the screen
+      const screenNumCols = Math.floor(app.screen.width / screenSquareSize);
+      const screenNumRows = Math.floor(app.screen.height / screenSquareSize);
       screenSquareSize = Math.min(
         app.screen.width / screenNumCols,
         app.screen.height / screenNumRows
