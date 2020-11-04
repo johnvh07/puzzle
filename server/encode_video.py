@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+if __name__ == '__main__':
+    import kpa.dev_utils; kpa.dev_utils.run(__file__)
+
+
 import subprocess, json, shutil
 
 from config import upload_dir_path, serve_dir_path, hosting_base_url
@@ -75,5 +79,14 @@ def encode_video(filename):
 
 if __name__ == '__main__':
     import sys
-    filename = sys.argv[1]
-    encode_video(filename)
+    if sys.argv[1:]:
+        for filename in sys.argv[1:]:
+            encode_video(filename)
+    else:
+        for path in upload_dir_path.iterdir():
+            if path.name.endswith('.json'):
+                filename = path.name[:-5]
+                if path.with_name(filename).is_file():
+                    print(filename)
+                    encode_video(filename)
+                    print()
