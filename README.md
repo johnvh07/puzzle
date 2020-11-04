@@ -1,6 +1,6 @@
 # TODO for index:
 
-- Make a 200x200 thumbnail for each puzzle and use it in the shared `info.json`.
+- Make a 200x200 low-fps thumbnail for each puzzle and use it in the shared `info.json`.
 
 
 # TODO for upload:
