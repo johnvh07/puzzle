@@ -32,10 +32,11 @@ def encode_video(filename):
     ]
     print(f'ffmpeg_argv = {argv}')
     ffmpeg_proc = subprocess.run(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-    print('FFMPEG OUTPUT:')
-    print(ffmpeg_proc.stdout)
-    print('===')
-    ffmpeg_proc.check_returncode()
+    if ffmpeg_proc.returncode != 0:
+        print('FFMPEG OUTPUT:')
+        print(ffmpeg_proc.stdout)
+        print('===')
+        ffmpeg_proc.check_returncode()
     max_filenum = max(int(prefix) for img_path in serve_subdir_path.iterdir() if (prefix := img_path.name.split('.')[0]).isdigit())
 
     argv = [
@@ -48,10 +49,11 @@ def encode_video(filename):
     ]
     print(f'ffmpeg_argv = {argv}')
     ffmpeg_proc = subprocess.run(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-    print('FFMPEG OUTPUT:')
-    print(ffmpeg_proc.stdout)
-    print('===')
-    ffmpeg_proc.check_returncode()
+    if ffmpeg_proc.returncode != 0:
+        print('FFMPEG OUTPUT:')
+        print(ffmpeg_proc.stdout)
+        print('===')
+        ffmpeg_proc.check_returncode()
 
     argv = [
         '/usr/bin/ffmpeg', '-i', str(upload_filepath),
@@ -63,10 +65,11 @@ def encode_video(filename):
     ]
     print(f'ffmpeg_argv = {argv}')
     ffmpeg_proc = subprocess.run(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-    print('FFMPEG OUTPUT:')
-    print(ffmpeg_proc.stdout)
-    print('===')
-    ffmpeg_proc.check_returncode()
+    if ffmpeg_proc.returncode != 0:
+        print('FFMPEG OUTPUT:')
+        print(ffmpeg_proc.stdout)
+        print('===')
+        ffmpeg_proc.check_returncode()
 
     (serve_subdir_path / 'info.json').write_text(json.dumps({
         'max_filenum': max_filenum,

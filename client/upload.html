@@ -36,12 +36,12 @@
         video_elem.style.display = 'inherit';
         video_elem.volume = 0;
         video_elem.addEventListener('timeupdate', () => {
-          document.querySelector('#video_info').innerHTML = `${video_elem.currentTime.toFixed(3)} / ${video_elem.duration.toFixed(3)}`
+          document.querySelector('#video_info').innerHTML = `${video_elem.currentTime.toFixed(2)} / ${video_elem.duration.toFixed(2)}`
         });
         const object_url = URL.createObjectURL(filelist[0]);
         video_elem.src = object_url;
         video_elem.addEventListener('loadedmetadata', () => {
-          document.querySelector('#endtime').value = video_elem.duration.toFixed(3);
+          document.querySelector('#endtime').value = (Math.ceil(video_elem.duration*10)/10).toFixed(1);  // Use ceiling to include the whole video
         })
         setTimeout(() => URL.revokeObjectURL(object_url), 100);  // I think it's ok to revoke this after the video fully loads
       }
