@@ -22,76 +22,76 @@ def encode_video(filename):
         shutil.rmtree(serve_subdir_path)
     serve_subdir_path.mkdir()
 
+    # TODO: Factor out a function for running these ffmpeg commands.
+    def run_ffmpeg(args):
+        print(f'ffmpeg_argv = {args}')
+        ffmpeg_proc = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+        if ffmpeg_proc.returncode != 0:
+            print('FFMPEG OUTPUT:')
+            print(ffmpeg_proc.stdout)
+            print('===')
+            ffmpeg_proc.check_returncode()
+
     # Make jpgs
-    argv = [
+    run_ffmpeg([
         '/usr/bin/ffmpeg', '-i', str(upload_filepath),
         '-an',  # remove audio
         '-ss', str(start_seconds), '-to', str(end_seconds),
         '-vf', 'fps=fps=30',
         '-qscale:v', '2',  # quality scales from 1=best to 31=worst
         str(serve_subdir_path / '%d.jpg')
-    ]
-    print(f'ffmpeg_argv = {argv}')
-    ffmpeg_proc = subprocess.run(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-    if ffmpeg_proc.returncode != 0:
-        print('FFMPEG OUTPUT:')
-        print(ffmpeg_proc.stdout)
-        print('===')
-        ffmpeg_proc.check_returncode()
+    ])
     max_filenum = max(int(prefix) for img_path in serve_subdir_path.iterdir() if (prefix := img_path.name.split('.')[0]).isdigit())
 
     # Make thumbnail 320px jpg
-    argv = [
+    run_ffmpeg([
         '/usr/bin/ffmpeg', '-i', str(upload_filepath),
         '-an',  # remove audio
         '-ss', str(start_seconds),
         '-vframes', '1',  # only 1 frame
         '-vf', 'scale=320:-1',  # 320px wide
         str(serve_subdir_path / '320px.jpg')
-    ]
-    print(f'ffmpeg_argv = {argv}')
-    ffmpeg_proc = subprocess.run(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-    if ffmpeg_proc.returncode != 0:
-        print('FFMPEG OUTPUT:')
-        print(ffmpeg_proc.stdout)
-        print('===')
-        ffmpeg_proc.check_returncode()
+    ])
 
     # Make thumbnail 320px mp4
-    argv = [
+    run_ffmpeg([
         '/usr/bin/ffmpeg', '-i', str(upload_filepath),
         '-an',  # remove audio
         '-ss', str(start_seconds), '-to', str(end_seconds),
         '-vf','fps=10,scale=320:-2',  # 10fps, 320px wide (the `-2` makes height an even number, which mp4 needs)
         '-loop', '0',  # loop forever
         str(serve_subdir_path / '320px.mp4')
-    ]
-    print(f'ffmpeg_argv = {argv}')
-    ffmpeg_proc = subprocess.run(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-    if ffmpeg_proc.returncode != 0:
-        print('FFMPEG OUTPUT:')
-        print(ffmpeg_proc.stdout)
-        print('===')
-        ffmpeg_proc.check_returncode()
-    argv = [
+    ])
+    run_ffmpeg([
         '/usr/bin/ffmpeg', '-i', str(serve_subdir_path / '320px.mp4'),
         '-filter_complex', '[0:v]reverse,fifo[r];[0:v][r] concat=n=2:v=1 [v]', '-map', '[v]',  # bounce (concatenate a forwards copy to a backwards copy)
         '-loop', '0',  # loop forever
         str(serve_subdir_path / '320px-bounce.mp4')
-    ]
-    print(f'ffmpeg_argv = {argv}')
-    ffmpeg_proc = subprocess.run(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-    if ffmpeg_proc.returncode != 0:
-        print('FFMPEG OUTPUT:')
-        print(ffmpeg_proc.stdout)
-        print('===')
-        ffmpeg_proc.check_returncode()
+    ])
+
+    # Make thumbnail 320px webm
+    run_ffmpeg([
+        '/usr/bin/ffmpeg', '-i', str(upload_filepath),
+        '-an',  # remove audio
+        '-ss', str(start_seconds), '-to', str(end_seconds),
+        '-vf','fps=10,scale=320:-2',  # 10fps, 320px wide (the `-2` makes height an even number, which mp4 needs)
+        '-loop', '0',  # loop forever
+        str(serve_subdir_path / '320px.webm')
+    ])
+    run_ffmpeg([
+        '/usr/bin/ffmpeg', '-i', str(serve_subdir_path / '320px.webm'),
+        '-filter_complex', '[0:v]reverse,fifo[r];[0:v][r] concat=n=2:v=1 [v]', '-map', '[v]',  # bounce (concatenate a forwards copy to a backwards copy)
+        '-loop', '0',  # loop forever
+        str(serve_subdir_path / '320px-bounce.webm')
+    ])
 
     (serve_subdir_path / 'info.json').write_text(json.dumps({
         'max_filenum': max_filenum,
         '320px_jpg': f'{hosting_base_url}/{filename}/320px.jpg',
         '320px_mp4': f'{hosting_base_url}/{filename}/320px.mp4',
         '320px_bounce_mp4': f'{hosting_base_url}/{filename}/320px-bounce.mp4',
+        '320px_webm': f'{hosting_base_url}/{filename}/320px.webm',
+        '320px_bounce_webm': f'{hosting_base_url}/{filename}/320px-bounce.webm',
     }, indent=1))
 
     make_shared_info_json()
