@@ -77,12 +77,12 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
       let screenSquareSize = Math.min(
         app.screen.height / sourceNumRows,  // size to fit height
         app.screen.width / sourceNumCols,  // size to fit width
-        Math.sqrt(app.screen.height * app.screen.width / numOccupiedCells * 0.66),  // size to use only 2/3 of the screen
+        Math.sqrt(app.screen.height * app.screen.width / numOccupiedCells * 0.5),  // size to use only 50% of the screen
       );
-      // Iteratively shrink screenSquareSize until 2/3 (or less) of cells are occupied
+      // Iteratively shrink screenSquareSize until 50% (or less) of cells are occupied
       while (1) {
         const totalNumCells = Math.floor(app.screen.width / screenSquareSize) * Math.floor(app.screen.height / screenSquareSize);
-        if (numOccupiedCells / totalNumCells < 0.66) {
+        if (numOccupiedCells / totalNumCells < 0.5) {
           break;
         }
         screenSquareSize *= 0.99;
