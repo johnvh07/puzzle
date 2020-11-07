@@ -54,11 +54,26 @@
       font-family: sans-serif;
       font-size: 18pt;
     }
-    div#grid img {
+    div#grid .grid-cell img {
       width: 80%;
       border-radius: 5px;  /* I'd prefer 2% of img width, but don't know how to do that. */
+      display: none;
     }
-    div#grid div a {
+    div#grid .grid-cell video {
+      width: 80%;
+      margin: auto;
+      border-radius: 5px;  /* I'd prefer 2% of img width, but don't know how to do that. */
+    }
+    div#grid .grid-cell.active img {
+      display: none;
+    }
+    div#grid .grid-cell.active video {
+    }
+    
+
+
+    /*--------------puzzle size buttons-------------------*/
+    div#grid .grid-cell div a {
       color: #222222;
       font-family: sans-serif;
       font-size: 12pt;
@@ -67,16 +82,16 @@
       margin: 5px;
       display: inline-block;
     }
-    div#grid div a:hover {
+    div#grid .grid-cell div a:hover {
       opacity: 0.4;
     }
-    div#grid div a:nth-child(1) {
+    div#grid .grid-cell div a:nth-child(1) {
       background:#b7ff6f
     }
-    div#grid div a:nth-child(2) {
+    div#grid .grid-cell div a:nth-child(2) {
       background:#ffb95d
     }
-    div#grid div a:nth-child(3) {
+    div#grid .grid-cell div a:nth-child(3) {
       background:#ff777d
     }
   </style>
@@ -89,16 +104,23 @@
   integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
   crossorigin="anonymous"></script>
   <script>
-fetch(`https://petervh.com/live/info.json`)
-  .then(response => response.json())
-  .then( function(data){
+    fetch(`https://petervh.com/live/info.json`)
+    .then(response => response.json())
+    .then( function(data){
       data.forEach( function(item ,index){
           let thumbnail_url = item['320px_jpg'] || ('https://petervh.com/live/'+item.name+'/1.jpg');
-          let tile = '<div class="grid-cell"><h3>' + item.name + '</h3><img alt="preview of puzzle named' + item.name + '" src="' + thumbnail_url + '"><div><a href="puzzle.html?image=' + item.name + '&pieces=25">25 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=100">100 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=400">400 piece</a></div></div>';
+          let vid_thumbnail_url = item['320px_bounce_mp4'];
+          let tile = '<div class="grid-cell"><h3>' + item.name + '</h3><video alt="preview of puzzle named' + item.name + '" loop preload="none" poster="' + thumbnail_url + '"><source src="' + vid_thumbnail_url + '" type="video/mp4">Your browser does not support the video tag.<img alt="preview of puzzle named' + item.name + '" src="' + thumbnail_url + '"></video><div><a href="puzzle.html?image=' + item.name + '&pieces=25">25 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=100">100 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=400">400 piece</a></div></div>';
           $('div#grid').append(tile);
       });
-  });
-
+      $(".grid-cell").hover(function(){
+        $(this).addClass("active");
+        $(this).find("video").attr("controls","true");
+        }, function(){
+        $(this).removeClass("active");
+        $(this).find("video").removeAttr("controls");
+      });
+    });
   </script>
 </body>
 </html>
