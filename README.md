@@ -22,6 +22,8 @@
 
 # TODO for puzzle:
 
+- Add a loading screen
+
 - Reactive-zoom the screen upon drop to always have 0.5 row/col empty on all sides (and allow dragging into that half row/col)
   - Should we change the x/y of every piece when this happens?  Or should we have 3 coordinate systems: SourceXY, StageXY, ScreenXY?
   - Rendering will use ScreenXY, clobbering will use StageXY, glueing will use SourceRowCol+StageRowCol, dragging will be a mess.
