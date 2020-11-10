@@ -8,9 +8,11 @@ def make_shared_info_json():
     ret = []
     for dirpath in serve_dir_path.iterdir():
         if dirpath.is_dir():
-            j = json.loads((dirpath / 'info.json').read_text())
-            j['name'] = dirpath.name
-            ret.append(j)
+            info_json_path = dirpath / 'info.json'
+            if info_json_path.is_file():
+                j = json.loads(info_json_path.read_text())
+                j['name'] = dirpath.name
+                ret.append(j)
     (serve_dir_path / 'info.json').write_text(json.dumps(ret))
 
 
