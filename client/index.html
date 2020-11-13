@@ -145,6 +145,7 @@
     });
     function DeleteSavedPuzzle() {
       localStorage.removeItem('saveProgress');
+      $('div#save1').remove();
     }
     // Retrieve Save Info
     if (localStorage.getItem("saveProgress")==null){
