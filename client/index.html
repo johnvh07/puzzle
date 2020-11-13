@@ -115,6 +115,8 @@
     }
   </style>
 </head>
+
+
 <body>
     <div id='saves'></div>
     <div id='grid'></div>
@@ -130,7 +132,10 @@
       data.forEach( function(item ,index){
           let thumbnail_url = item['320px_jpg'] || ('https://petervh.com/live/'+item.name+'/1.jpg');
           let vid_thumbnail_url = item['320px_bounce_mp4'];
-          let tile = '<div class="grid-cell"><h3>' + item.name + '</h3><video alt="preview of puzzle named' + item.name + '" loop preload="none" poster="' + thumbnail_url + '"><source src="' + vid_thumbnail_url + '" type="video/mp4">Your browser does not support the video tag.<img alt="preview of puzzle named' + item.name + '" src="' + thumbnail_url + '"></video><div><a href="puzzle.html?image=' + item.name + '&pieces=25">25 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=100">100 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=400">400 piece</a></div></div>';
+          var tileTitle = '<h3>' + item.name + '</h3>',
+              tileVideo = '<video alt="preview of puzzle named' + item.name + '" loop preload="none" poster="' + thumbnail_url + '"><source src="' + vid_thumbnail_url + '" type="video/mp4">Your browser does not support the video tag.<img alt="preview of puzzle named' + item.name + '" src="' + thumbnail_url + '"></video>',
+              tileLinks = '<div><a href="puzzle.html?image=' + item.name + '&pieces=25">25 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=100">100 piece</a><a href="puzzle.html?image=' + item.name + '&pieces=400">400 piece</a></div>';
+          let tile = '<div class="grid-cell">' + tileTitle + tileVideo + tileLinks + '</div>';
           $('div#grid').append(tile);
       });
       $(".grid-cell video").hover(function(){
@@ -179,10 +184,12 @@
       var puzzleSaveInfo = JSON.parse(localStorage.getItem("saveProgress")),
           timeAgoSaved = timeSince(puzzleSaveInfo['timeSaved']),
           linkText = '' + puzzleSaveInfo['image'] + ' ' + puzzleSaveInfo['size'] + ' piece puzzle last saved ' + timeAgoSaved + ' ago',
-          linkDestination = 'puzzle.html',
+          linkDestination = 'puzzle.html?image=' + puzzleSaveInfo['image'] + '&pieces=' + puzzleSaveInfo['size'],
           saveHTML = '<div id="save1"><a href="' + linkDestination + '">' + linkText + '</a><button onclick="DeleteSavedPuzzle()">delete save</button></div>';
       $('div#saves').append(saveHTML);
     }
   </script>
 </body>
 </html>
+
+
