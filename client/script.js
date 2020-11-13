@@ -249,12 +249,27 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           });
         }
       }
+      // Save the Puzzle to local storage.
+      
+      
+      function puzzleProgressSaver() {
+        var puzzleSaveInfo = {
+          size: minNumPieces,
+          image: imageName,
+          timeSaved: Math.floor(new Date().getTime() / 1000)
+        }
+        localStorage.setItem("saveProgress", JSON.stringify(puzzleSaveInfo));
+        console.log(JSON.stringify(puzzleSaveInfo));
+      }
+
       function onDragEnd() {
         const square = this;
         if (square.isDragging && square.aligned) {
           square.isDragging = false;
           square.dragStartOffset = undefined;
 
+
+          puzzleProgressSaver()
           // Shove the squares getting covered-up into empty spaces
           // TODO: instead of re-using getSquareID, make an equivalent function with a better name
           const groundOccupiedPositions = _.filter(squares, sq => sq.zIndex === 0).map(sq => getSquareID(...getScreenRowColFromXY(sq.x, sq.y)));
