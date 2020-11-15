@@ -51,10 +51,17 @@ def upload_file():
 
         if not request.form.to_dict()['streetname'].lower().strip().startswith(secret_password):
             abort(Response('Wrong password.', 404))
-        if not 0 <= float(request.form.to_dict()['starttime']) < 1000:
+
+        start_time = float(request.form.to_dict()['starttime'])
+        if not 0 <= start_time < 1000:
             abort(Response('Illegal start time.', 404))
-        if not 0 <= float(request.form.to_dict()['endtime']) < 1000:
+        end_time = float(request.form.to_dict()['endtime'])
+        if not 0 <= end_time < 1000:
             abort(Response('Illegal end time.', 404))
+
+        puzzlename = request.form.to_dict()['puzzlename']
+        if puzzlename == '':
+            abort(Response('Name was left blank.', 404))
 
         if 'video' not in request.files:
             abort(Response('This request didnt have any files.', 404))
@@ -62,18 +69,14 @@ def upload_file():
         if not file or file.filename == '':
             abort(Response('This request didnt include any real files.', 404))
 
-        puzzlename = secure_filename(request.form.to_dict()['puzzlename'])
-        if puzzlename == '':
-            abort(Response('Name was left blank.', 404))
-
-        filename = secure_filename(request.form.to_dict()['puzzleid'])
+        filename = secure_filename(request.form.to_dict()['puzzleid'] or puzzlename)
         while (upload_dir_path / filename).exists(): filename += random.choice('123456789')
         while (serve_dir_path / filename).exists(): filename += random.choice('123456789')
         file.save(upload_dir_path / filename)
         (upload_dir_path / f'{filename}.json').write_text(json.dumps({
-            'start_seconds': float(request.form.to_dict()['starttime']),
-            'end_seconds': float(request.form.to_dict()['endtime']),
-            'puzzlename': request.form.to_dict()['puzzlename'],
+            'start_seconds': start_time,
+            'end_seconds': end_time,
+            'puzzlename': puzzlename,
         }))
         encode_video(filename)
 
