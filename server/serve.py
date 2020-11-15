@@ -63,7 +63,7 @@ def upload_file():
             abort(Response('This request didnt include any real files.', 404))
 
         puzzlename = secure_filename(request.form.to_dict()['puzzlename'])
-        if not puzzlename == '':
+        if puzzlename == '':
             abort(Response('Name was left blank.', 404))
 
         filename = secure_filename(request.form.to_dict()['puzzleid'])
