@@ -62,13 +62,18 @@ def upload_file():
         if not file or file.filename == '':
             abort(Response('This request didnt include any real files.', 404))
 
-        filename = secure_filename(request.form.to_dict()['filename'])
+        puzzlename = secure_filename(request.form.to_dict()['puzzlename'])
+        if not puzzlename == '':
+            abort(Response('Name was left blank.', 404))
+
+        filename = secure_filename(request.form.to_dict()['puzzleid'])
         while (upload_dir_path / filename).exists(): filename += random.choice('123456789')
         while (serve_dir_path / filename).exists(): filename += random.choice('123456789')
         file.save(upload_dir_path / filename)
         (upload_dir_path / f'{filename}.json').write_text(json.dumps({
             'start_seconds': float(request.form.to_dict()['starttime']),
             'end_seconds': float(request.form.to_dict()['endtime']),
+            'puzzlename': request.form.to_dict()['puzzlename'],
         }))
         encode_video(filename)
 

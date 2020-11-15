@@ -8,8 +8,8 @@
 <body>
   <form method="post" enctype="multipart/form-data">
     <p><input id="upload" name="video" type="file" accept="video/*"></input></p>
-    <p>Save this video with the name: <input id="title" name="title" type="text" oninput="updateID()"></input></p>
-    <p>Save this video with the id: <input id="filename" name="filename" type="text"></input></p>
+    <p>Save this video with the name: <input id="puzzlename" name="puzzlename" type="text" oninput="updateID()"></input></p>
+    <p>Save this video with the id: <input id="puzzleid" name="puzzleid" type="text"></input></p>
     <p>
       Trim video to start at
       <input id="starttime" name="starttime" type="number" min="0" step="0.1" style="width:5em"></input> seconds and end at
@@ -33,7 +33,7 @@
       window._d = {filelist};
       document.querySelector('#output').innerHTML = filelist.map((f,idx) => `files[${idx}] = {size:${f.size.toLocaleString()} bytes, type:${f.type}}`).join('<br>');
       if (filelist.length === 1 && filelist[0].type.startsWith('video/')) {
-        document.querySelector('#filename').value = /[^\.]+/.exec(filelist[0].name) || (Math.random()*1e6).toFixed(0);
+        document.querySelector('#puzzleid').value = /[^\.]+/.exec(filelist[0].name) || (Math.random()*1e6).toFixed(0);
         const video_elem = document.querySelector('#video');
         video_elem.style.display = 'inherit';
         video_elem.volume = 0;
@@ -54,13 +54,13 @@
     
     function updateID(){
       console.log('test');
-      var orginalTitle = document.getElementById("title").value;
+      var orginalTitle = document.getElementById("puzzlename").value;
       var lowerCaseTitle = String(orginalTitle).toLowerCase();
       var convertedID = lowerCaseTitle.split(' ').join('-').split('&').join('and').split('.').join('').split('#').join('').split('$').join('');
       console.log(orginalTitle);
       console.log(lowerCaseTitle);
       console.log(convertedID);
-      document.getElementById("filename").value = convertedID;
+      document.getElementById("puzzleid").value = convertedID;
     };
 
 
