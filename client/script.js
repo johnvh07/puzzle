@@ -56,8 +56,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         squareID % squareIDRowMultiplier
       ];
     });
-    var maxFileNum = data.max_filenum || 47;
-    console.log(maxFileNum);
+    var maxFileNum = data.max_filenum || 1;
     const app = new PIXI.Application({
       backgroundColor:0x444444,
       width:window.innerWidth - 3, height:window.innerHeight - 10,
@@ -263,15 +262,20 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           });
         }
       }
+
       // Save the Puzzle to local storage.
-      
-      
-      function puzzleProgressSaver() {
-        if (continuingSavedPuzzle||noCurentSave){
+      function savePuzzleProgress() {
+        if (continuingSavedPuzzle||noCurentSave) {
+          var pieceLocations = {};
+          Object.keys(squares).forEach(squareID => {
+            pieceLocations[squareID] = getSquareID(...getScreenRowColFromXY(squares[squareID].x, squares[squareID].y));
+          });
+
           var puzzleSaveInfo = {
             size: minNumPieces,
             image: imageName,
-            timeSaved: Math.floor(new Date().getTime() / 1000)
+            timeSaved: Math.floor(new Date().getTime() / 1000),
+            pieceLocations: pieceLocations
           }
           localStorage.setItem("saveProgress", JSON.stringify(puzzleSaveInfo));
           console.log(JSON.stringify(puzzleSaveInfo));
@@ -284,8 +288,6 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           square.isDragging = false;
           square.dragStartOffset = undefined;
 
-
-          puzzleProgressSaver()
           // Shove the squares getting covered-up into empty spaces
           // TODO: instead of re-using getSquareID, make an equivalent function with a better name
           const groundOccupiedPositions = _.filter(squares, sq => sq.zIndex === 0).map(sq => getSquareID(...getScreenRowColFromXY(sq.x, sq.y)));
@@ -316,6 +318,8 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
 
           square.aligned.squares.forEach(sqID => { squares[sqID].zIndex = 0; });
           delete square.aligned;
+
+          savePuzzleProgress();
         }
       }
     });
