@@ -16,7 +16,7 @@ def encode_video(filename):
     upload_info = json.loads((upload_dir_path / f'{filename}.json').read_text())
     start_seconds = upload_info['start_seconds']
     end_seconds = upload_info['end_seconds']
-    puzzlename = upload_info['puzzlename']
+    puzzlename = upload_info['puzzlename'] if 'puzzlename' in upload_info else filename.replace('-', ' ').title()
     serve_subdir_path = (serve_dir_path / filename)  # TODO: name better
     if serve_subdir_path.exists():
         print(f'Deleting existing directory {serve_subdir_path}')
