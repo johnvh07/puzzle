@@ -29,8 +29,9 @@ function extent(arr) {
 
 const imageName = findGetParameter('image') || 'viv-slide'; console.log('Note: Try appending ?image=hex to URL');
 const minNumPieces = +findGetParameter('pieces') || 100; console.log('Note: Try appending ?pieces=30 to URL');
-let noCurentSave = true;
-let continuingSavedPuzzle = false;
+//let noCurentSave = true;
+//let continuingSavedPuzzle = false;
+/*
 if (localStorage.getItem("saveProgress")==null){
   console.log('no saved progress');
 } else {
@@ -42,6 +43,29 @@ if (localStorage.getItem("saveProgress")==null){
     console.log("continuing");
   }
 }
+*/
+
+if (localStorage.getItem('puzzleSaveIndex')==null){
+  var puzzleSaveIndex = {};
+  console.log(localStorage.getItem('puzzleSaveIndex'));
+} else {
+  console.log(localStorage.getItem('puzzleSaveIndex'));
+  var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
+}
+puzzleSaveIndex[ minNumPieces + '_' + imageName ] = {
+  size: minNumPieces,
+  image: imageName,
+  progress: Math.floor(Math.random() * 100), //<----------------------------------------------update later with actual progress data **********************************************************
+  timeSaved: Math.floor(new Date().getTime() / 1000)
+}
+localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
+console.log(JSON.stringify(puzzleSaveIndex));
+
+
+
+
+
+
 
 fetch(`https://petervh.com/live/${imageName}/info.json`)
   .then(response => response.json())
@@ -262,7 +286,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           });
         }
       }
-
+/*
       // Save the Puzzle to local storage.
       function savePuzzleProgress() {
         if (continuingSavedPuzzle||noCurentSave) {
@@ -282,28 +306,8 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         }
         localStorage.setItem("saveProgress", JSON.stringify(puzzleSaveInfo));
         console.log(JSON.stringify(puzzleSaveInfo));
-
-
-
-
-        var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
-        puzzleSaveIndex[ minNumPieces + '_' + imageName ] = {
-          size: minNumPieces,
-          image: imageName,
-          timeSaved: Math.floor(new Date().getTime() / 1000)
-        }
-        localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
-        console.log(JSON.stringify(puzzleSaveIndex));
-
-
-
-
-        //var thisPuzzleSave = JSON.parse(localStorage.getItem(minNumPieces+' '+imageName));
-
-
-
-
       }
+*/
 
       function onDragEnd() {
         const square = this;
