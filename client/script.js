@@ -293,7 +293,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           timeSaved: Math.floor(new Date().getTime() / 1000)
         }
         localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
-        console.log(JSON.stringify(puzzleSaveInfo));
+        console.log(JSON.stringify(puzzleSaveIndex));
 
 
 
