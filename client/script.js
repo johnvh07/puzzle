@@ -274,12 +274,35 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           var puzzleSaveInfo = {
             size: minNumPieces,
             image: imageName,
-            timeSaved: Math.floor(new Date().getTime() / 1000),
-            pieceLocations: pieceLocations
+            timeSaved: Math.floor(new Date().getTime() / 1000)//,
+            //pieceLocations: pieceLocations
           }
           localStorage.setItem("saveProgress", JSON.stringify(puzzleSaveInfo));
           console.log(JSON.stringify(puzzleSaveInfo));
         }
+        localStorage.setItem("saveProgress", JSON.stringify(puzzleSaveInfo));
+        console.log(JSON.stringify(puzzleSaveInfo));
+
+
+
+
+        var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
+        puzzleSaveIndex[ minNumPieces + '_' + imageName ] = {
+          size: minNumPieces,
+          image: imageName,
+          timeSaved: Math.floor(new Date().getTime() / 1000)
+        }
+        localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
+        console.log(JSON.stringify(puzzleSaveInfo));
+
+
+
+
+        //var thisPuzzleSave = JSON.parse(localStorage.getItem(minNumPieces+' '+imageName));
+
+
+
+
       }
 
       function onDragEnd() {
