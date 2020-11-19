@@ -59,7 +59,6 @@ puzzleSaveIndex[ minNumPieces + '_' + imageName ] = {
   timeSaved: Math.floor(new Date().getTime() / 1000)
 }
 localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
-console.log(JSON.stringify(puzzleSaveIndex));
 
 
 
@@ -346,7 +345,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           square.aligned.squares.forEach(sqID => { squares[sqID].zIndex = 0; });
           delete square.aligned;
 
-          savePuzzleProgress();
+          //savePuzzleProgress();
         }
       }
     });

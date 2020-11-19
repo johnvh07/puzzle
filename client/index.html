@@ -126,6 +126,8 @@
   integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
   crossorigin="anonymous"></script>
   <script>
+
+
     fetch(`https://petervh.com/live/info.json`)
     .then(response => response.json())
     .then( function(data){
@@ -148,15 +150,69 @@
         $(this).get()[0].pause();
       });
     });
-    function DeleteSavedPuzzle() {
-      localStorage.removeItem('saveProgress');
-      $('div#save1').remove();
+    
+    
+    
+    // Retrieve Save Info v2.0
+    
+    function timeSince(date) {
+      var seconds = Math.floor((new Date()/ 1000) - date );
+      var interval = seconds / 31536000;
+      if (interval > 1) {
+        return Math.floor(interval) + " years";
+      }
+      interval = seconds / 2592000;
+      if (interval > 1) {
+        return Math.floor(interval) + " months";
+      }
+      interval = seconds / 86400;
+      if (interval > 1) {
+        return Math.floor(interval) + " days";
+      }
+      interval = seconds / 3600;
+      if (interval > 1) {
+        return Math.floor(interval) + " hours";
+      }
+      interval = seconds / 60;
+      if (interval > 1) {
+        return Math.floor(interval) + " minutes";
+      }
+      return Math.floor(seconds) + " seconds";
     }
+
+    if (localStorage.getItem('puzzleSaveIndex')==null){
+      console.log('No Puzzle Save Index');
+    } else {
+      var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
+
+      Object.entries(puzzleSaveIndex).forEach(entry => {
+        const [key, value] = entry;
+        var timeAgoSaved = timeSince(puzzleSaveIndex[key]['timeSaved']);
+        var linkText = '' + puzzleSaveIndex[key]['image'] + ' ' + puzzleSaveIndex[key]['size'] + ' piece puzzle last saved ' + timeAgoSaved + ' ago';
+        var linkDestination = 'puzzle.html?image=' + puzzleSaveIndex[key]['image'] + '&pieces=' + puzzleSaveIndex[key]['size'];
+        var saveHTML = '<div id="' + key + '" class="puzzleSave"><a href="' + linkDestination + '">' + linkText + '</a><button onclick="DeleteSavedPuzzle()">delete save</button></div>';
+        $('div#saves').append(saveHTML);
+      });
+    }
+    function DeleteSavedPuzzle() {
+      console.log('remove save');
+    }
+
+
+
+
+
+    
+    /*
+
+
+
+    
     // Retrieve Save Info
+
     if (localStorage.getItem("saveProgress")==null){
       console.log('no saved progress');
     } else {
-      console.log(localStorage.getItem("saveProgress"));
       function timeSince(date) {
         var seconds = Math.floor((new Date()/ 1000) - date );
         var interval = seconds / 31536000;
@@ -180,7 +236,12 @@
           return Math.floor(interval) + " minutes";
         }
         return Math.floor(seconds) + " seconds";
-        }
+      }
+      var puzzleSaveInfo = JSON.parse(localStorage.getItem("saveProgress")),
+
+
+
+
       var puzzleSaveInfo = JSON.parse(localStorage.getItem("saveProgress")),
           timeAgoSaved = timeSince(puzzleSaveInfo['timeSaved']),
           linkText = '' + puzzleSaveInfo['image'] + ' ' + puzzleSaveInfo['size'] + ' piece puzzle last saved ' + timeAgoSaved + ' ago',
@@ -188,6 +249,7 @@
           saveHTML = '<div id="save1"><a href="' + linkDestination + '">' + linkText + '</a><button onclick="DeleteSavedPuzzle()">delete save</button></div>';
 //      $('div#saves').append(saveHTML);
     }
+    */
   </script>
 </body>
 </html>
