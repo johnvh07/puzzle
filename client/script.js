@@ -34,8 +34,7 @@ if (localStorage.getItem('puzzleSaveIndex')==null){
   var puzzleSaveIndex = {};
   localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
 }
-
-console.log(localStorage.getItem(minNumPieces + '_' + imageName));
+var SAVE_KEY = minNumPieces + '_' + imageName;
 
 fetch(`https://petervh.com/live/${imageName}/info.json`)
   .then(response => response.json())
@@ -93,6 +92,17 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           break;
         }
         screenSquareSize *= 0.99;
+      }
+      // Resize to fit enough rows/cols for saved data (if it exists)
+      if (localStorage.hasOwnProperty(SAVE_KEY)) {
+        _.each(JSON.parse(localStorage.getItem(SAVE_KEY)), (screenposID,squareID) => {
+          const [screenRow, screenCol] = getSourceRowCol(screenposID);
+          screenSquareSize = Math.min(
+            screenSquareSize,
+            app.screen.height / (1+screenRow),  // Why does this need `1+`?
+            app.screen.width / (1+screenCol)
+          );
+        });
       }
       // Grow screenSquareSize a bit so that some row or column will perfectly hit the edge of the screen
       const screenNumCols = Math.floor(app.screen.width / screenSquareSize);
@@ -177,6 +187,18 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         square.y = y;
         app.stage.addChild(square);
       });
+
+      // Load saved data (if it exists)
+      if (localStorage.hasOwnProperty(SAVE_KEY)) {
+        console.log('loading save!');
+        _.each(JSON.parse(localStorage.getItem(SAVE_KEY)), (screenposID,squareID) => {
+          const screenRowCol = getSourceRowCol(screenposID);
+          const [x, y] = getScreenXYFromRowCol(...screenRowCol);
+          const square = squares[squareID];
+          square.x = x;
+          square.y = y;
+        });
+      }
 
       function onDragStart(event) {
         // Remember the offset from the center of the square to the pointer,
@@ -273,7 +295,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         Object.keys(squares).forEach(squareID => {
           pieceLocations[squareID] = getSquareID(...getScreenRowColFromXY(squares[squareID].x, squares[squareID].y));
         });
-        localStorage.setItem(minNumPieces + '_' + imageName, JSON.stringify(pieceLocations));
+        localStorage.setItem(SAVE_KEY, JSON.stringify(pieceLocations));
       }
 
       function onDragEnd() {
