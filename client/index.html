@@ -190,12 +190,17 @@
         var timeAgoSaved = timeSince(puzzleSaveIndex[key]['timeSaved']);
         var linkText = '' + puzzleSaveIndex[key]['image'] + ' ' + puzzleSaveIndex[key]['size'] + ' piece puzzle last saved ' + timeAgoSaved + ' ago';
         var linkDestination = 'puzzle.html?image=' + puzzleSaveIndex[key]['image'] + '&pieces=' + puzzleSaveIndex[key]['size'];
-        var saveHTML = '<div id="' + key + '" class="puzzleSave"><a href="' + linkDestination + '">' + linkText + '</a><button onclick="DeleteSavedPuzzle()">delete save</button></div>';
+        var saveHTML = '<div id="' + key + '" class="puzzleSave"><a href="' + linkDestination + '">' + linkText + '</a><button onclick="DeleteSavedPuzzle(\'' + key + '\')">delete save</button></div>';
         $('div#saves').append(saveHTML);
       });
     }
-    function DeleteSavedPuzzle() {
-      console.log('remove save');
+    function DeleteSavedPuzzle(puzzleSaveKey) {
+      var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
+      delete puzzleSaveIndex[puzzleSaveKey];
+      localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
+      $('div#saves #' + puzzleSaveKey).remove();
+      
+      console.log(puzzleSaveKey,'removed');
     }
 
 

@@ -47,18 +47,10 @@ if (localStorage.getItem("saveProgress")==null){
 
 if (localStorage.getItem('puzzleSaveIndex')==null){
   var puzzleSaveIndex = {};
-  console.log(localStorage.getItem('puzzleSaveIndex'));
-} else {
-  console.log(localStorage.getItem('puzzleSaveIndex'));
-  var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
+  localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
 }
-puzzleSaveIndex[ minNumPieces + '_' + imageName ] = {
-  size: minNumPieces,
-  image: imageName,
-  progress: Math.floor(Math.random() * 100), //<----------------------------------------------update later with actual progress data **********************************************************
-  timeSaved: Math.floor(new Date().getTime() / 1000)
-}
-localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
+
+console.log(localStorage.getItem(minNumPieces + '_' + imageName));
 
 
 
@@ -285,28 +277,24 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           });
         }
       }
-/*
+
       // Save the Puzzle to local storage.
       function savePuzzleProgress() {
-        if (continuingSavedPuzzle||noCurentSave) {
-          var pieceLocations = {};
-          Object.keys(squares).forEach(squareID => {
-            pieceLocations[squareID] = getSquareID(...getScreenRowColFromXY(squares[squareID].x, squares[squareID].y));
-          });
-
-          var puzzleSaveInfo = {
-            size: minNumPieces,
-            image: imageName,
-            timeSaved: Math.floor(new Date().getTime() / 1000)//,
-            //pieceLocations: pieceLocations
-          }
-          localStorage.setItem("saveProgress", JSON.stringify(puzzleSaveInfo));
-          console.log(JSON.stringify(puzzleSaveInfo));
+        var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
+        puzzleSaveIndex[ minNumPieces + '_' + imageName ] = {
+          size: minNumPieces,
+          image: imageName,
+          progress: Math.floor(Math.random() * 100), //<----------------------------------------------update later with actual progress data **********************************************************
+          timeSaved: Math.floor(new Date().getTime() / 1000)
         }
-        localStorage.setItem("saveProgress", JSON.stringify(puzzleSaveInfo));
-        console.log(JSON.stringify(puzzleSaveInfo));
+        localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
+
+        var pieceLocations = {};
+        Object.keys(squares).forEach(squareID => {
+          pieceLocations[squareID] = getSquareID(...getScreenRowColFromXY(squares[squareID].x, squares[squareID].y));
+        });
+        localStorage.setItem(minNumPieces + '_' + imageName, JSON.stringify(pieceLocations));
       }
-*/
 
       function onDragEnd() {
         const square = this;
@@ -345,7 +333,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           square.aligned.squares.forEach(sqID => { squares[sqID].zIndex = 0; });
           delete square.aligned;
 
-          //savePuzzleProgress();
+          savePuzzleProgress();
         }
       }
     });
