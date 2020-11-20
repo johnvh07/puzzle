@@ -29,21 +29,6 @@ function extent(arr) {
 
 const imageName = findGetParameter('image') || 'viv-slide'; console.log('Note: Try appending ?image=hex to URL');
 const minNumPieces = +findGetParameter('pieces') || 100; console.log('Note: Try appending ?pieces=30 to URL');
-//let noCurentSave = true;
-//let continuingSavedPuzzle = false;
-/*
-if (localStorage.getItem("saveProgress")==null){
-  console.log('no saved progress');
-} else {
-  noCurentSave = false;
-  console.log(localStorage.getItem("saveProgress"));
-  var puzzleSaveInfo = JSON.parse(localStorage.getItem("saveProgress"));
-  if((imageName == puzzleSaveInfo['image'])&&(minNumPieces== puzzleSaveInfo['size'])){
-    continuingSavedPuzzle = true;
-    console.log("continuing");
-  }
-}
-*/
 
 if (localStorage.getItem('puzzleSaveIndex')==null){
   var puzzleSaveIndex = {};
@@ -51,12 +36,6 @@ if (localStorage.getItem('puzzleSaveIndex')==null){
 }
 
 console.log(localStorage.getItem(minNumPieces + '_' + imageName));
-
-
-
-
-
-
 
 fetch(`https://petervh.com/live/${imageName}/info.json`)
   .then(response => response.json())
