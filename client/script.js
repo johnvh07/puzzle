@@ -263,6 +263,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         puzzleSaveIndex[ minNumPieces + '_' + imageName ] = {
           size: minNumPieces,
           image: imageName,
+          name: data.puzzlename,
           progress: Math.floor(Math.random() * 100), //<----------------------------------------------update later with actual progress data **********************************************************
           timeSaved: Math.floor(new Date().getTime() / 1000)
         }

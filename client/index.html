@@ -188,7 +188,7 @@
       Object.entries(puzzleSaveIndex).forEach(entry => {
         const [key, value] = entry;
         var timeAgoSaved = timeSince(puzzleSaveIndex[key]['timeSaved']);
-        var linkText = '' + puzzleSaveIndex[key]['image'] + ' ' + puzzleSaveIndex[key]['size'] + ' piece puzzle last saved ' + timeAgoSaved + ' ago';
+        var linkText = '' + puzzleSaveIndex[key]['name'] + ' ' + puzzleSaveIndex[key]['size'] + ' piece puzzle last saved ' + timeAgoSaved + ' ago';
         var linkDestination = 'puzzle.html?image=' + puzzleSaveIndex[key]['image'] + '&pieces=' + puzzleSaveIndex[key]['size'];
         var saveHTML = '<div id="' + key + '" class="puzzleSave"><a href="' + linkDestination + '">' + linkText + '</a><button onclick="DeleteSavedPuzzle(\'' + key + '\')">delete save</button></div>';
         $('div#saves').append(saveHTML);
@@ -198,8 +198,8 @@
       var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
       delete puzzleSaveIndex[puzzleSaveKey];
       localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
+      storage.removeItem(puzzleSaveKey);
       $('div#saves #' + puzzleSaveKey).remove();
-      
       console.log(puzzleSaveKey,'removed');
     }
 
