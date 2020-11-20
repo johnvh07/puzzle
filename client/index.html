@@ -198,7 +198,7 @@
       var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
       delete puzzleSaveIndex[puzzleSaveKey];
       localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
-      storage.removeItem(puzzleSaveKey);
+      localStorage.removeItem(puzzleSaveKey);
       $('div#saves #' + puzzleSaveKey).remove();
       console.log(puzzleSaveKey,'removed');
     }
