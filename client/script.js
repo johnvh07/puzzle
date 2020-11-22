@@ -287,9 +287,12 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           image: imageName,
           name: data.puzzlename,
           progress: Math.floor(Math.random() * 100), //<----------------------------------------------update later with actual progress data **********************************************************
-          timeSaved: Math.floor(new Date().getTime() / 1000)
+          timeSaved: new Date().toISOString()
         }
         localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
+        console.log(puzzleSaveIndex[ minNumPieces + '_' + imageName ]['timeSaved']);
+        var date = new Date(puzzleSaveIndex[ minNumPieces + '_' + imageName ]['timeSaved']);
+        console.log(date.getTime());
 
         var pieceLocations = {};
         Object.keys(squares).forEach(squareID => {
