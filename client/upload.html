@@ -33,7 +33,6 @@
       window._d = {filelist};
       document.querySelector('#output').innerHTML = filelist.map((f,idx) => `files[${idx}] = {size:${f.size.toLocaleString()} bytes, type:${f.type}}`).join('<br>');
       if (filelist.length === 1 && filelist[0].type.startsWith('video/')) {
-        document.querySelector('#puzzleid').value = /[^\.]+/.exec(filelist[0].name) || (Math.random()*1e6).toFixed(0);
         const video_elem = document.querySelector('#video');
         video_elem.style.display = 'inherit';
         video_elem.volume = 0;
@@ -53,13 +52,10 @@
     } else { console.log(window.location.host);}
     
     function updateID(){
-      console.log('test');
       var orginalTitle = document.getElementById("puzzlename").value;
       var lowerCaseTitle = String(orginalTitle).toLowerCase();
       var convertedID = lowerCaseTitle.split(' ').join('-').split('&').join('and').split('.').join('').split('#').join('').split('$').join('');
-      console.log(orginalTitle);
-      console.log(lowerCaseTitle);
-      console.log(convertedID);
+      console.log(orginalTitle, lowerCaseTitle, convertedID);
       document.getElementById("puzzleid").value = convertedID;
     };
 
