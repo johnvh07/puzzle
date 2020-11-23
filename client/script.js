@@ -30,7 +30,7 @@ function extent(arr) {
 const imageName = findGetParameter('image') || 'viv-slide'; console.log('Note: Try appending ?image=hex to URL');
 const minNumPieces = +findGetParameter('pieces') || 100; console.log('Note: Try appending ?pieces=30 to URL');
 
-if (localStorage.getItem('puzzleSaveIndex')==null){
+if (localStorage.getItem('puzzleSaveIndex')==null) {
   var puzzleSaveIndex = {};
   localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
 }
@@ -38,8 +38,8 @@ var SAVE_KEY = minNumPieces + '_' + imageName;
 
 fetch(`https://petervh.com/live/${imageName}/info.json`)
   .then(response => response.json())
-  .then( function(data){ 
-    document.title = 'Puzzle | ' + minNumPieces + ' - ' + data.puzzlename; 
+  .then( function(data) {
+    document.title = 'Puzzle | ' + minNumPieces + ' - ' + data.puzzlename;
     const squareIDRowMultiplier = 10000; // Never do a puzzle with 10001 or more columns
     const getSquareID = function(row, column) {
       return row * squareIDRowMultiplier + column;
@@ -84,10 +84,10 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
       let screenSquareSize = Math.min(
         app.screen.height / sourceNumRows,  // size to fit height
         app.screen.width / sourceNumCols,  // size to fit width
-        Math.sqrt(app.screen.height * app.screen.width / numOccupiedCells * 0.5),  // size to use only 50% of the screen
+        Math.sqrt(app.screen.height * app.screen.width / numOccupiedCells * 0.5)  // size to use only 50% of the screen
       );
       // Iteratively shrink screenSquareSize until 50% (or less) of cells are occupied
-      while (1) {
+      for(;;) {
         const totalNumCells = Math.floor(app.screen.width / screenSquareSize) * Math.floor(app.screen.height / screenSquareSize);
         if (numOccupiedCells / totalNumCells < 0.5) {
           break;
@@ -95,7 +95,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         screenSquareSize *= 0.99;
       }
       // Resize to fit enough rows/cols for saved data (if it exists)
-      if (localStorage.hasOwnProperty(SAVE_KEY)) {
+      if (Object.prototype.hasOwnProperty.call(localStorage, SAVE_KEY)) {
         _.each(JSON.parse(localStorage.getItem(SAVE_KEY)), (screenposID,squareID) => {
           const [screenRow, screenCol] = getSourceRowCol(screenposID);
           screenSquareSize = Math.min(
@@ -190,7 +190,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
       });
 
       // Load saved data (if it exists)
-      if (localStorage.hasOwnProperty(SAVE_KEY)) {
+      if (Object.prototype.hasOwnProperty.call(localStorage, SAVE_KEY)) {
         console.log('loading save!');
         _.each(JSON.parse(localStorage.getItem(SAVE_KEY)), (screenposID,squareID) => {
           const screenRowCol = getSourceRowCol(screenposID);
@@ -289,7 +289,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           name: data.puzzlename,
           progress: Math.floor(Math.random() * 100), //<----------------------------------------------update later with actual progress data **********************************************************
           timeSaved: new Date().toISOString()
-        }
+        };
         localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
         console.log(puzzleSaveIndex[ minNumPieces + '_' + imageName ]['timeSaved']);
         var date = new Date(puzzleSaveIndex[ minNumPieces + '_' + imageName ]['timeSaved']);
@@ -343,5 +343,4 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         }
       }
     });
-  }
-);
+  });
