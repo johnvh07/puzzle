@@ -185,10 +185,6 @@
     } else {
       var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
 
-      puzzleSaveIndexArray = Object.entries(puzzleSaveIndex).map(e => e[1]);
-      puzzleSaveIndexArray.sort((a, b) => (a.timeSaved < b.timeSaved) ? 1 : -1)
-      console.log(puzzleSaveIndexArray);
-
       Object.entries(puzzleSaveIndex).forEach(entry => {
         const [key, value] = entry;
         var timeAgoSaved = timeSince(new Date(puzzleSaveIndex[key]['timeSaved']));
