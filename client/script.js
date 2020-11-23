@@ -29,6 +29,7 @@ function extent(arr) {
 
 const imageName = findGetParameter('image') || 'viv-slide'; console.log('Note: Try appending ?image=hex to URL');
 const minNumPieces = +findGetParameter('pieces') || 100; console.log('Note: Try appending ?pieces=30 to URL');
+const videoBounceType = findGetParameter('bouncetype') || 'linear';  console.log('Note: Try appending ?bouncetype=sine to URL');
 
 if (localStorage.getItem('puzzleSaveIndex')==null) {
   var puzzleSaveIndex = {};
@@ -161,13 +162,26 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           baseTexture,
           new PIXI.Rectangle(colIdx*sourceSquareSize, rowIdx*sourceSquareSize, sourceSquareSize, sourceSquareSize)
         ));
-        textures.push(...textures.slice().reverse());
 
-        const square = new PIXI.AnimatedSprite(textures);
+        let smoothed_textures = [];
+        if (videoBounceType === 'sine') {
+          _.range(0, 2*textures.length).map(playback_frame => {
+            const frac = playback_frame / 2 / textures.length;
+            const sin_frac = (1 - Math.cos(Math.PI * frac)) / 2;
+            let frame_num = Math.round(sin_frac * (textures.length-1));
+            //frame_num = _.clamp(frame_num, 0, textures.length-1);
+            smoothed_textures.push(textures[frame_num]);
+          });
+        } else {
+          smoothed_textures = textures;
+        }
+        smoothed_textures.push(...smoothed_textures.slice().reverse());
+
+        const square = new PIXI.AnimatedSprite(smoothed_textures);
         square.squareID = squareID;
         square.width = square.height = screenSquareSize;
         square.anchor.set(0.5);
-        square.animationSpeed = 0.5;
+        square.animationSpeed = (videoBounceType === 'sine') ? 1 : 0.5;
         square.play();
 
         square.buttonMode = true; // show "hand" cursor when hovered
