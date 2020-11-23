@@ -39,6 +39,7 @@ var SAVE_KEY = minNumPieces + '_' + imageName;
 fetch(`https://petervh.com/live/${imageName}/info.json`)
   .then(response => response.json())
   .then( function(data){ 
+    document.title = 'Puzzle | ' + minNumPieces + ' - ' + data.puzzlename; 
     const squareIDRowMultiplier = 10000; // Never do a puzzle with 10001 or more columns
     const getSquareID = function(row, column) {
       return row * squareIDRowMultiplier + column;
