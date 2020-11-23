@@ -229,6 +229,10 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
 
         // Bring along aligned neighbors
         square.aligned = {squares: []};
+        // This function adds all aligned neighbors of the square `alignedSquareID`.
+        // It find the row and col of this square on the screen and on the source image.
+        // Then, for each of its source neighbors, it checks whether they're at the right offset. (`isAligned`)
+        // If they are, then we call this function on that aligned neighbor to get all its neighbors.
         function addAlignedSquare(alignedSquareID) {
           if (!square.aligned.squares.includes(alignedSquareID)) {
             square.aligned.squares.push(alignedSquareID);
