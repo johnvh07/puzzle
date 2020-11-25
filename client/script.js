@@ -153,6 +153,8 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         return ret;
       });
 
+      window.getNeighborIDs = getNeighborIDs;
+      
       // Initialize the squares:
       const squares = {}; window._d.squares = squares;
       for (let [rowIdx, colIdx] of sourceRowColPairs) {
@@ -309,7 +311,6 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           timeSaved: new Date().toISOString()
         };
         localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
-        console.log(puzzleSaveIndex[ minNumPieces + '_' + imageName ]['timeSaved']);
         var date = new Date(puzzleSaveIndex[ minNumPieces + '_' + imageName ]['timeSaved']);
         console.log(date.getTime());
 
