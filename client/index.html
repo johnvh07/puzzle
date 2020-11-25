@@ -194,10 +194,11 @@
       }
       return Math.floor(seconds) + " seconds";
     }
-
+    var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
+    var puzzleSaveIndexArray = Object.entries(puzzleSaveIndex).map(e => e[1]);
     function buildSaveList(sortByProp) {
-      var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
-      var puzzleSaveIndexArray = Object.entries(puzzleSaveIndex).map(e => e[1]);
+      //var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
+      //var puzzleSaveIndexArray = Object.entries(puzzleSaveIndex).map(e => e[1]);
       puzzleSaveIndexArray.sort((a, b) => (a[sortByProp] < b[sortByProp]) ? 1 : -1)
       console.log(puzzleSaveIndexArray);
       
@@ -216,8 +217,10 @@
     if (localStorage.getItem('puzzleSaveIndex')==null){
       console.log('No Puzzle Save Index');
     } else {
-      var sortButtonsHTML = '<div id="sortButtons" class="sortButtons"><button onclick="buildSaveList(\'size\')">Sort By Size</button><button onclick="buildSaveList(\'image\')">Sort By Image Name</button><button onclick="buildSaveList(\'timeSaved\')">Sort By Time Saved</button><button onclick="buildSaveList(\'progress\')">Sort By Progress</button></div>'
-      $('div#saves').append(sortButtonsHTML);
+      if (puzzleSaveIndexArray.length > 5) {
+        var sortButtonsHTML = '<div id="sortButtons" class="sortButtons"><button onclick="buildSaveList(\'size\')">Sort By Size</button><button onclick="buildSaveList(\'image\')">Sort By Image Name</button><button onclick="buildSaveList(\'timeSaved\')">Sort By Time Saved</button><button onclick="buildSaveList(\'progress\')">Sort By Progress</button></div>'
+        $('div#saves').append(sortButtonsHTML);
+      }
       buildSaveList('timeSaved');
     }
 
