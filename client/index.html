@@ -36,12 +36,20 @@
       padding: 5px 8px;
       font-size: 12pt;
       border-radius: 0 2px 2px 0;
-      background: #ff777d;
       border: none;
       cursor: pointer;
     }
-    div#saves button:hover {
+    div#saves button.delete {
+      background: #ff777d;
+    }
+    div#saves button.delete:hover {
       background: #7e4547;
+    }
+    div#saves .sortButtons button {
+      background: #ffb95d;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      border-radius: 2px;
     }
     div#grid {
       display: flex;
@@ -187,26 +195,33 @@
       return Math.floor(seconds) + " seconds";
     }
 
+    function buildSaveList(sortByProp) {
+      var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
+      var puzzleSaveIndexArray = Object.entries(puzzleSaveIndex).map(e => e[1]);
+      puzzleSaveIndexArray.sort((a, b) => (a[sortByProp] < b[sortByProp]) ? 1 : -1)
+      console.log(puzzleSaveIndexArray);
+      
+      $('div#saves .puzzleSave').remove();
+
+      for (let i = 0;i<puzzleSaveIndexArray.length;i++){
+        var objectKey = puzzleSaveIndexArray[i]['size'] + '_' + puzzleSaveIndexArray[i]['image'];
+        var aStyle = 'style="background: linear-gradient(90deg, #6fd6ff ' + puzzleSaveIndexArray[i]['progress'] + '%, #6fd6ffbf ' + puzzleSaveIndexArray[i]['progress'] + '%);"'
+        var timeAgoSaved = timeSince(new Date(puzzleSaveIndexArray[i]['timeSaved']));
+        var linkText = '' + puzzleSaveIndexArray[i]['name'] + ' ' + puzzleSaveIndexArray[i]['size'] + ' piece puzzle last saved ' + timeAgoSaved + ' ago';
+        var linkDestination = 'puzzle.html?image=' + puzzleSaveIndexArray[i]['image'] + '&pieces=' + puzzleSaveIndexArray[i]['size'];
+        var saveHTML = '<div id="' + objectKey + '" class="puzzleSave"><a href="' + linkDestination + '"' + aStyle + '>' + linkText + '</a><button class="delete" onclick="deleteSavedPuzzle(\'' + objectKey + '\')">delete save</button></div>';
+        $('div#saves').append(saveHTML);
+      }
+    }
     if (localStorage.getItem('puzzleSaveIndex')==null){
       console.log('No Puzzle Save Index');
     } else {
-      var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
-
-      var puzzleSaveIndexArray = Object.entries(puzzleSaveIndex).map(e => e[1]);
-      puzzleSaveIndexArray.sort((a, b) => (a.timeSaved < b.timeSaved) ? 1 : -1)
-      console.log(puzzleSaveIndexArray);
-
-        for (let i = 0;i<puzzleSaveIndexArray.length;i++){
-          var objectKey = puzzleSaveIndexArray[i]['size'] + '_' + puzzleSaveIndexArray[i]['image'];
-          var aStyle = 'style="background: linear-gradient(90deg, #6fd6ff ' + puzzleSaveIndexArray[i]['progress'] + '%, #6fd6ffbf ' + puzzleSaveIndexArray[i]['progress'] + '%);"'
-          var timeAgoSaved = timeSince(new Date(puzzleSaveIndexArray[i]['timeSaved']));
-          var linkText = '' + puzzleSaveIndexArray[i]['name'] + ' ' + puzzleSaveIndexArray[i]['size'] + ' piece puzzle last saved ' + timeAgoSaved + ' ago';
-          var linkDestination = 'puzzle.html?image=' + puzzleSaveIndexArray[i]['image'] + '&pieces=' + puzzleSaveIndexArray[i]['size'];
-          var saveHTML = '<div id="' + objectKey + '" class="puzzleSave"><a href="' + linkDestination + '"' + aStyle + '>' + linkText + '</a><button onclick="DeleteSavedPuzzle(\'' + objectKey + '\')">delete save</button></div>';
-          $('div#saves').append(saveHTML);
-        }
+      var sortButtonsHTML = '<div id="sortButtons" class="sortButtons"><button onclick="buildSaveList(\'size\')">Sort By Size</button><button onclick="buildSaveList(\'image\')">Sort By Image Name</button><button onclick="buildSaveList(\'timeSaved\')">Sort By Time Saved</button><button onclick="buildSaveList(\'progress\')">Sort By Progress</button></div>'
+      $('div#saves').append(sortButtonsHTML);
+      buildSaveList('timeSaved');
     }
-    function DeleteSavedPuzzle(puzzleSaveKey) {
+
+    function deleteSavedPuzzle(puzzleSaveKey) {
       var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
       delete puzzleSaveIndex[puzzleSaveKey];
       localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
