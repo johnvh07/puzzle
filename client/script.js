@@ -42,10 +42,10 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
   .then( function(data) {
     document.title = 'Puzzle | ' + minNumPieces + ' - ' + data.puzzlename;
 
-    window.dataLayer = window.dataLayer || [];
+    /*window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-LJV2FB75RX');
+    gtag('config', 'G-LJV2FB75RX');*/
 
     const squareIDRowMultiplier = 10000; // Never do a puzzle with 10001 or more columns
     const getSquareID = function(row, column) {
