@@ -160,9 +160,8 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         if (col+1 < sourceNumCols) { ret.push(getSquareID(row, col+1)); }
         return ret;
       });
+      window._d.getNeighborIDs = getNeighborIDs;
 
-      window.getNeighborIDs = getNeighborIDs;
-      
       // Initialize the squares:
       const squares = {}; window._d.squares = squares;
       for (let [rowIdx, colIdx] of sourceRowColPairs) {
