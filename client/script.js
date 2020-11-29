@@ -27,6 +27,8 @@ function extent(arr) {
   return [min, max];
 }
 
+document.title = 'Puzzle | ' + findGetParameter('pieces') + ' - ' + findGetParameter('image');
+
 const imageName = findGetParameter('image') || 'viv-slide'; console.log('Note: Try appending ?image=hex to URL');
 const minNumPieces = +findGetParameter('pieces') || 100; console.log('Note: Try appending ?pieces=30 to URL');
 const videoBounceType = findGetParameter('bouncetype') || 'linear';  console.log('Note: Try appending ?bouncetype=sine to URL');
