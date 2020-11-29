@@ -34,6 +34,7 @@ def all_images():
     images = sorted(c.name for c in Path(serve_dir_path).iterdir() if c.is_dir() and not c.is_symlink())
     return '\n'.join(f'<p><a href="/?image={image}">{image}</a></p>' for image in images)
 
+@app.route('/create')
 @app.route('/upload.html')
 def upload_redirect():
     return redirect(url_for('upload_file'))
@@ -77,7 +78,7 @@ def upload_file():
             'start_seconds': start_time,
             'end_seconds': end_time,
             'puzzlename': puzzlename,
-        }))
+        }, indent=1))
         encode_video(filename)
 
         return f'Saved as <a href="/puzzle.html?image={filename}">{filename}</a>'

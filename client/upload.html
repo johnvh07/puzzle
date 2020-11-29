@@ -27,13 +27,22 @@
     <p>The name of the street where our family home is: <input name="streetname" type="text"></input></p>
     <p><input type="submit" value="Upload!" formaction="/upload"></input></p>
   </form>
+  <br><br><br>
   <hr>
   <video id="video" controls playsinline muted autoplay style="max-width:100%;max-height:100vh;display:none"></video>
   <p id="video_info"></p>
   <hr>
   <p id="output" style="font-family:monospace"></p>
-  <p>Instructions for iPhone live photos: Open the live photo in the Photos app, swipe to see options, and choose "bounce" mode to convert the live photo to a video before uploading here.  If your screen becomes dominated by the video while uploading, try rotating your phone.  The puzzle itself will automatically bounce the video (ie, play it forwards and then backwards), so it's best to trim off the second half.</p>
-  <p>Instructions for Macbook live photos: Open the live photo in the Photos app, and click File -&gt; Export -&gt; "Export Original" and click "Export", which should put a ".mov" movie on your Desktop.</p>
+  <p><b>Instructions for iPhone live photos:</b></p>
+  <div style="padding-left:2em">
+    <p>(1) Open the Photos app and open your live photo; (2) Swipe up to see options; (3) Choose "bounce" mode to convert the live photo to a video before uploading here; (4) Come back to this page and click "Browse" and select your newly-created bouncy video.</p>
+    <p>Sometimes when you upload, your whole screen gets filled by the video and you can't get out.  If that happens, try rotating your phone.</p>
+    <p>The puzzle itself will automatically bounce the video (ie, play it forwards and then backwards), so it's best to trim off the second half (when it's playing in reverse) to make it load faster.</p>
+  </div>
+  <p><b>Instructions for Macbook live photos:</b></p>
+  <div style="padding-left:2em">
+    <p>Open the live photo in the Photos app, and click File -&gt; Export -&gt; "Export Original" and click "Export", which should put a ".mov" movie on your Desktop.</p>
+  </div>
   <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
   <script>
     document.querySelector('#starttime').value = 0;  // This value gets retained on reload, so set it to 0.
