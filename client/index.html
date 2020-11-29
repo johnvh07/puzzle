@@ -158,7 +158,7 @@
     fetch(`https://petervh.com/live/info.json`)
     .then(response => response.json())
     .then( function(data){
-      data.forEach( function(item ,index){
+      _.sortBy(data, 'puzzlename').forEach( function(item ,index){
           let thumbnail_url = item['320px_jpg'] || ('https://petervh.com/live/'+item.puzzleid+'/1.jpg');
           let vid_thumbnail_url = item['320px_bounce_mp4'];
           var tileTitle = '<h3>' + item.puzzlename + '</h3>',
