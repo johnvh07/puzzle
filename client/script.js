@@ -72,6 +72,10 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
     imgPaths.forEach(imgPath => app.loader.add(imgPath));
     app.loader.load(function() {
 
+      document.querySelectorAll('.loading-indicator').forEach(elem => {
+          elem.parentNode.removeChild(elem)
+      });
+
       const baseTextures = imgPaths.map(imgPath => PIXI.BaseTexture.from(imgPath));
       const firstBaseTexture = baseTextures[0];
       // TODO: assert that all baseTextures have the same width and height
