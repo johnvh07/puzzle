@@ -15,6 +15,10 @@
 
 - Preview the currently selected range and crop bouncing (to help make smooth bounces)
 
+- Allow adding motionblur (perhaps just of a specific color range)
+
+- Allow not reversing (for a video that is perfect-looped) or perhaps just fading end-to-start
+
 
 # TODO for puzzle:
 
