@@ -23,11 +23,13 @@ def encode_video(filename):
         shutil.rmtree(serve_subdir_path)
     serve_subdir_path.mkdir()
 
-    # TODO: Factor out a function for running these ffmpeg commands.
     def run_ffmpeg(args):
+        args = ['/usr/bin/ffmpeg', '-hide_banner'] + args
         print(f'ffmpeg_argv = {args}')
         ffmpeg_proc = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-        if ffmpeg_proc.returncode != 0:
+        if ffmpeg_proc.returncode == 0:
+            print('ffmpeg_output =', repr(ffmpeg_proc.stdout))
+        else:
             print('FFMPEG OUTPUT:')
             print(ffmpeg_proc.stdout)
             print('===')
@@ -35,7 +37,7 @@ def encode_video(filename):
 
     # Make jpgs
     run_ffmpeg([
-        '/usr/bin/ffmpeg', '-i', str(upload_filepath),
+        '-i', str(upload_filepath),
         '-an',  # remove audio
         '-ss', str(start_seconds), '-to', str(end_seconds),
         '-vf', 'fps=fps=30',
@@ -46,7 +48,7 @@ def encode_video(filename):
 
     # Make thumbnail 320px jpg
     run_ffmpeg([
-        '/usr/bin/ffmpeg', '-i', str(upload_filepath),
+        '-i', str(upload_filepath),
         '-an',  # remove audio
         '-ss', str(start_seconds),
         '-vframes', '1',  # only 1 frame
@@ -56,7 +58,7 @@ def encode_video(filename):
 
     # Make thumbnail 320px mp4
     run_ffmpeg([
-        '/usr/bin/ffmpeg', '-i', str(upload_filepath),
+        '-i', str(upload_filepath),
         '-an',  # remove audio
         '-ss', str(start_seconds), '-to', str(end_seconds),
         '-vf','fps=10,scale=320:-2',  # 10fps, 320px wide (the `-2` makes height an even number, which mp4 needs)
@@ -64,7 +66,7 @@ def encode_video(filename):
         str(serve_subdir_path / '320px.mp4')
     ])
     run_ffmpeg([
-        '/usr/bin/ffmpeg', '-i', str(serve_subdir_path / '320px.mp4'),
+        '-i', str(serve_subdir_path / '320px.mp4'),
         '-filter_complex', '[0:v]reverse,fifo[r];[0:v][r] concat=n=2:v=1 [v]', '-map', '[v]',  # bounce (concatenate a forwards copy to a backwards copy)
         '-loop', '0',  # loop forever
         str(serve_subdir_path / '320px-bounce.mp4')
@@ -72,7 +74,7 @@ def encode_video(filename):
 
     # Make thumbnail 320px webm
     run_ffmpeg([
-        '/usr/bin/ffmpeg', '-i', str(upload_filepath),
+        '-i', str(upload_filepath),
         '-an',  # remove audio
         '-ss', str(start_seconds), '-to', str(end_seconds),
         '-vf','fps=10,scale=320:-2',  # 10fps, 320px wide (the `-2` makes height an even number, which mp4 needs)
@@ -80,7 +82,7 @@ def encode_video(filename):
         str(serve_subdir_path / '320px.webm')
     ])
     run_ffmpeg([
-        '/usr/bin/ffmpeg', '-i', str(serve_subdir_path / '320px.webm'),
+        '-i', str(serve_subdir_path / '320px.webm'),
         '-filter_complex', '[0:v]reverse,fifo[r];[0:v][r] concat=n=2:v=1 [v]', '-map', '[v]',  # bounce (concatenate a forwards copy to a backwards copy)
         '-loop', '0',  # loop forever
         str(serve_subdir_path / '320px-bounce.webm')
