@@ -33,8 +33,9 @@
   - We can add frames to the puzzle after it has started by modifying `animatedSprite.textures` (https://www.html5gamedevs.com/topic/28818-how-to-update-texture-for-animatedsprite)
   - Build this as an option (`&vid=1`) and enable for compatible browsers
   - Option 1: use a js video decoder to convert video -> frames
-    - jsmpeg only handles inefficient mpeg1
     - look into bellard's BPG: https://bellard.org/bpg/animation.html
+    - jsmpeg only handles inefficient mpeg1
+    - ffmpeg.js would probably work for webm
   - Option 2: use `<video>` & `<canvas>` to convert video -> frames (at what speed? realtime?)
   - Option 3: some other compression method
 
