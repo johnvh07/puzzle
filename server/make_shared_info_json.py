@@ -13,7 +13,7 @@ def make_shared_info_json():
                 j = json.loads(info_json_path.read_text())
                 j['puzzleid'] = dirpath.name
                 ret.append(j)
-    (serve_dir_path / 'info.json').write_text(json.dumps(ret))
+    (serve_dir_path / 'info.json').write_text(json.dumps(ret, indent=0))
 
 
 if __name__ == '__main__':
