@@ -277,8 +277,8 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         // Show held squares above non-held squares.  This requires 'this.parent.sortableChildren'.
         square.aligned.squares.forEach(sqID => { squares[sqID].zIndex = 1; });
 
-        // console.log(mySourceRowCol, square.aligned);
       }
+
       function onDragMove(event) {
         const square = this;
         if (square.isDragging && square.aligned && square.aligned.squares.length) {
@@ -332,7 +332,6 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         });
         return Math.floor(100*correctConnections/totalConnections);
       };
-
       // Save the Puzzle to local storage.
       function savePuzzleProgress() {
         var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
@@ -340,12 +339,11 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           size: minNumPieces,
           image: imageName,
           name: data.puzzlename,
-          progress: calculatePuzzleProgress(), //<----------------------------------------------update later with actual progress data **********************************************************
+          progress: calculatePuzzleProgress(),
           timeSaved: new Date().toISOString()
         };
         localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
         var date = new Date(puzzleSaveIndex[ minNumPieces + '_' + imageName ]['timeSaved']);
-        console.log(date.getTime());
 
         var pieceLocations = {};
         Object.keys(squares).forEach(squareID => {
