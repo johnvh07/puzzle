@@ -311,6 +311,28 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         }
       }
 
+      function calculatePuzzleProgress() {
+        var totalConnections = 0,
+            correctConnections = 0;
+        Object.entries(squares).forEach(function([key, value]){
+          var thisSquareNeighborIDs = getNeighborIDs(key);
+          const getSquareOffsetX = function(calledSquareID) {
+            return (Math.floor(squares[calledSquareID].position.x / screenSquareSize)) - getSourceRowCol(calledSquareID)[1];
+          };
+          const getSquareOffsetY = function(calledSquareID) {
+            return (Math.floor(squares[calledSquareID].position.y / screenSquareSize)) - getSourceRowCol(calledSquareID)[0];
+          };
+          thisSquareNeighborIDs.forEach(function(item){
+            totalConnections++;
+            if (getSquareOffsetX(key)==getSquareOffsetX(item)&&getSquareOffsetY(key)==getSquareOffsetY(item)) {
+              correctConnections++;
+            }
+//            console.log('checking ' + key, 'against ' + item,correctConnections + ' of ' + totalConnections + ' connections');
+          })        
+        });
+        return Math.floor(100*correctConnections/totalConnections);
+      };
+
       // Save the Puzzle to local storage.
       function savePuzzleProgress() {
         var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
@@ -318,7 +340,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           size: minNumPieces,
           image: imageName,
           name: data.puzzlename,
-          progress: Math.floor(Math.random() * 100), //<----------------------------------------------update later with actual progress data **********************************************************
+          progress: calculatePuzzleProgress(), //<----------------------------------------------update later with actual progress data **********************************************************
           timeSaved: new Date().toISOString()
         };
         localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
