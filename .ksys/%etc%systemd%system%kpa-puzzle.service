@@ -1,0 +1,13 @@
+[Unit]
+Description=kpa-puzzle
+After=network.target
+OnFailure=kpa-failure-telegram@%i.service
+
+[Service]
+User=nobody
+Group=nogroup
+WorkingDirectory=/srv/puzzle/puzzle/server/
+ExecStart=/srv/puzzle/puzzle/server/venv/bin/gunicorn serve:app --bind 127.0.0.1:8003 -k gevent --access-logfile -
+
+[Install]
+WantedBy=multi-user.target
