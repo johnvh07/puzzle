@@ -44,23 +44,26 @@ def upload_file():
         return send_file(Path().absolute().parent / 'client' / 'upload.html')
 
     elif request.method == 'POST':
+        form = request.form.to_dict()
+
         print('files =', request.files)
-        print('form =', request.form.to_dict())
+        print('form =', form)
 
         if get_free_space() < 500e6:
             abort(Response('Too little space left on disk', 500))
 
-        if not request.form.to_dict()['streetname'].lower().strip().startswith(secret_password):
+
+        if not form['streetname'].lower().strip().startswith(secret_password):
             abort(Response('Wrong password.', 404))
 
-        start_time = float(request.form.to_dict()['starttime'])
+        start_time = float(form['starttime'])
         if not 0 <= start_time < 1000:
             abort(Response('Illegal start time.', 404))
-        end_time = float(request.form.to_dict()['endtime'])
+        end_time = float(form['endtime'])
         if not 0 <= end_time < 1000:
             abort(Response('Illegal end time.', 404))
 
-        puzzlename = request.form.to_dict()['puzzlename']
+        puzzlename = form['puzzlename']
         if puzzlename == '':
             abort(Response('Name was left blank.', 404))
 
@@ -70,7 +73,7 @@ def upload_file():
         if not file or file.filename == '':
             abort(Response('This request didnt include any real files.', 404))
 
-        filename = secure_filename(request.form.to_dict()['puzzleid'] or puzzlename)
+        filename = secure_filename(form['puzzleid'] or puzzlename)
         while (upload_dir_path / filename).exists(): filename += random.choice('123456789')
         while (serve_dir_path / filename).exists(): filename += random.choice('123456789')
         file.save(upload_dir_path / filename)
