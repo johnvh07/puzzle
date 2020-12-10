@@ -188,7 +188,9 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         } else {
           smoothed_textures = textures;
         }
-        smoothed_textures.push(...smoothed_textures.slice().reverse());
+        if (data.bounce !== false) {
+            smoothed_textures.push(...smoothed_textures.slice().reverse());
+        }
 
         const square = new PIXI.AnimatedSprite(smoothed_textures);
         square.squareID = squareID;

@@ -16,6 +16,7 @@ def encode_video(filename):
     upload_info = json.loads((upload_dir_path / f'{filename}.json').read_text())
     start_seconds = upload_info['start_seconds']
     end_seconds = upload_info['end_seconds']
+    bounce = upload_info.get('bounce', True)
     puzzlename = upload_info['puzzlename'] if 'puzzlename' in upload_info else filename.replace('-', ' ').title()
     serve_subdir_path = (serve_dir_path / filename)  # TODO: name better
     if serve_subdir_path.exists():
@@ -36,6 +37,7 @@ def encode_video(filename):
             ffmpeg_proc.check_returncode()
 
     # Make jpgs
+    # TODO: Use 1 million pixels or less
     run_ffmpeg([
         '-i', str(upload_filepath),
         '-an',  # remove audio
@@ -63,39 +65,44 @@ def encode_video(filename):
         '-ss', str(start_seconds), '-to', str(end_seconds),
         '-vf','fps=10,scale=320:-2',  # 10fps, 320px wide (the `-2` makes height an even number, which mp4 needs)
         '-loop', '0',  # loop forever
-        str(serve_subdir_path / '320px.mp4')
+        str(serve_subdir_path / '320px-forward.mp4')
     ])
-    run_ffmpeg([
-        '-i', str(serve_subdir_path / '320px.mp4'),
-        '-filter_complex', '[0:v]reverse,fifo[r];[0:v][r] concat=n=2:v=1 [v]', '-map', '[v]',  # bounce (concatenate a forwards copy to a backwards copy)
-        '-loop', '0',  # loop forever
-        str(serve_subdir_path / '320px-bounce.mp4')
-    ])
+    if bounce:
+        run_ffmpeg([
+            '-i', str(serve_subdir_path / '320px-forward.mp4'),
+            '-filter_complex', '[0:v]reverse,fifo[r];[0:v][r] concat=n=2:v=1 [v]', '-map', '[v]',  # bounce (concatenate a forwards copy to a backwards copy)
+            '-loop', '0',  # loop forever
+            str(serve_subdir_path / '320px.mp4')
+        ])
+    else:
+        (serve_subdir_path / '320px.mp4').symlink_to(serve_subdir_path / '320px-forward.mp4')
 
     # Make thumbnail 320px webm
     run_ffmpeg([
         '-i', str(upload_filepath),
         '-an',  # remove audio
         '-ss', str(start_seconds), '-to', str(end_seconds),
-        '-vf','fps=10,scale=320:-2',  # 10fps, 320px wide (the `-2` makes height an even number, which mp4 needs)
+        '-vf','fps=10,scale=320:-2',  # 10fps, 320px wide (the `-2` makes height an even number)
         '-loop', '0',  # loop forever
-        str(serve_subdir_path / '320px.webm')
+        str(serve_subdir_path / '320px-forward.webm')
     ])
-    run_ffmpeg([
-        '-i', str(serve_subdir_path / '320px.webm'),
-        '-filter_complex', '[0:v]reverse,fifo[r];[0:v][r] concat=n=2:v=1 [v]', '-map', '[v]',  # bounce (concatenate a forwards copy to a backwards copy)
-        '-loop', '0',  # loop forever
-        str(serve_subdir_path / '320px-bounce.webm')
-    ])
+    if bounce:
+        run_ffmpeg([
+            '-i', str(serve_subdir_path / '320px-forward.webm'),
+            '-filter_complex', '[0:v]reverse,fifo[r];[0:v][r] concat=n=2:v=1 [v]', '-map', '[v]',  # bounce (concatenate a forwards copy to a backwards copy)
+            '-loop', '0',  # loop forever
+            str(serve_subdir_path / '320px.webm')
+        ])
+    else:
+        (serve_subdir_path / '320px.webm').symlink_to(serve_subdir_path / '320px-forward.webm')
 
     (serve_subdir_path / 'info.json').write_text(json.dumps({
         'max_filenum': max_filenum,
         'puzzlename': puzzlename,
+        'bounce': bounce,
         '320px_jpg': f'{hosting_base_url}/{filename}/320px.jpg',
         '320px_mp4': f'{hosting_base_url}/{filename}/320px.mp4',
-        '320px_bounce_mp4': f'{hosting_base_url}/{filename}/320px-bounce.mp4',
         '320px_webm': f'{hosting_base_url}/{filename}/320px.webm',
-        '320px_bounce_webm': f'{hosting_base_url}/{filename}/320px-bounce.webm',
     }, indent=1))
 
     make_shared_info_json()

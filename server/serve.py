@@ -63,6 +63,8 @@ def upload_file():
         if not 0 <= end_time < 1000:
             abort(Response('Illegal end time.', 404))
 
+        bounce = bool(form.get('bounce', ''))
+
         puzzlename = form['puzzlename']
         if puzzlename == '':
             abort(Response('Name was left blank.', 404))
@@ -80,6 +82,7 @@ def upload_file():
         (upload_dir_path / f'{filename}.json').write_text(json.dumps({
             'start_seconds': start_time,
             'end_seconds': end_time,
+            'bounce': bounce,
             'puzzlename': puzzlename,
         }, indent=1))
         encode_video(filename)
