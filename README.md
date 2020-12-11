@@ -54,12 +54,26 @@
 
 # Notes about bpg:
 
-Installation:
+Install bpgenc on Linux:
 
 ```
 sudo apt install libsdl-image1.2-dev yasm cmake libjpeg-dev libpng-dev
-brew install emscripten
 wget 'https://bellard.org/bpg/libbpg-0.9.8.tar.gz' && tar xzf libbpg*gz && cd libbpg*
-make && make bpgdec8a.js
+make
 /home/kpa/build/libbpg-0.9.8/bpgenc -a /var/www/html/live/viv-slide/%d.jpg -fps 30 -o /var/www/html/live/viv-slide/forward.bpg
+```
+
+Make bpgdec8a.js on Mac:
+
+```
+brew install yasm gcc libpng jpeg libbpg emscripten
+wget 'https://bellard.org/bpg/libbpg-0.9.8.tar.gz' && tar xzf libbpg*gz && cd libbpg*
+edit Makefile
+# comment USE_BPGVIEW=y
+# uncomment CONFIG_APPLE=y
+# use GCC-10 and G++-10 (for GNU instead of Clang)
+# CFLAGS+=-I/usr/local/include -L/usr/local/lib
+# LDFLAGS+=-I/usr/local/include -L/usr/local/lib
+# remove unknown `-s NO_BROWSER=1`
+make bpgdec8a.js
 ```
