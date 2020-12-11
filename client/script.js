@@ -75,6 +75,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
       document.querySelectorAll('.loading-indicator').forEach(elem => {
           elem.parentNode.removeChild(elem)
       });
+      document.body.style.cursor = 'grab';
 
       const baseTextures = imgPaths.map(imgPath => PIXI.BaseTexture.from(imgPath));
       const firstBaseTexture = baseTextures[0];
@@ -199,8 +200,8 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
         square.animationSpeed = (videoBounceType === 'sine') ? 1 : 0.5;
         square.play();
 
-        square.buttonMode = true; // show "hand" cursor when hovered
         square.interactive = true; // required for mouse/touch interaction
+        square.cursor = 'inherit';
         square
           .on('pointerdown', onDragStart) // `pointer` catches both mouse and touch
           .on('pointerup', onDragEnd)
@@ -231,6 +232,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
       }
 
       function onDragStart(event) {
+        this.cursor = 'grabbing';
         // Remember the offset from the center of the square to the pointer,
         //  because in onDragMove() we don't just want to center the square
         //  on the whever the pointer is.
@@ -355,6 +357,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
       }
 
       function onDragEnd() {
+        this.cursor = 'inherit';
         const square = this;
         if (square.isDragging && square.aligned) {
           square.isDragging = false;
