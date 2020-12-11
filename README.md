@@ -50,3 +50,16 @@
 - When dragging a group of pieces, show a shadow behind them (but above non-held pieces)
 - Show rectangles instead of squares to fill the screen?
 - Rotate pieces - Tap an edge to point it up? Drag a corner (shown on hover)? Drag across rotator-zone? Right-click? Shake? Two-finger? Or don't?
+
+
+# Notes about bpg:
+
+Installation:
+
+```
+sudo apt install libsdl-image1.2-dev yasm cmake libjpeg-dev libpng-dev
+brew install emscripten
+wget 'https://bellard.org/bpg/libbpg-0.9.8.tar.gz' && tar xzf libbpg*gz && cd libbpg*
+make && make bpgdec8a.js
+/home/kpa/build/libbpg-0.9.8/bpgenc -a /var/www/html/live/viv-slide/%d.jpg -fps 30 -o /var/www/html/live/viv-slide/forward.bpg
+```
