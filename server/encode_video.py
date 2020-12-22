@@ -16,8 +16,9 @@ def encode_video(filename):
     upload_info = json.loads((upload_dir_path / f'{filename}.json').read_text())
     start_seconds = upload_info['start_seconds']
     end_seconds = upload_info['end_seconds']
-    bounce = upload_info.get('bounce', True)
+    bounce = bool(upload_info.get('bounce', True))
     puzzlename = upload_info['puzzlename'] if 'puzzlename' in upload_info else filename.replace('-', ' ').title()
+    list_publicly = bool(upload_info.get('list_publicly', True))
     serve_subdir_path = (serve_dir_path / filename)  # TODO: name better
     if serve_subdir_path.exists():
         print(f'Deleting existing directory {serve_subdir_path}')
@@ -100,6 +101,7 @@ def encode_video(filename):
         'max_filenum': max_filenum,
         'puzzlename': puzzlename,
         'bounce': bounce,
+        'list_publicly': list_publicly,
         '320px_jpg': f'{hosting_base_url}/{filename}/320px.jpg',
         '320px_mp4': f'{hosting_base_url}/{filename}/320px.mp4',
         '320px_webm': f'{hosting_base_url}/{filename}/320px.webm',

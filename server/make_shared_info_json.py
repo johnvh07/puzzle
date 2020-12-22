@@ -11,8 +11,9 @@ def make_shared_info_json():
             info_json_path = dirpath / 'info.json'
             if info_json_path.is_file():
                 j = json.loads(info_json_path.read_text())
-                j['puzzleid'] = dirpath.name
-                ret.append(j)
+                if j.get('list_publicly', True):
+                    j['puzzleid'] = dirpath.name
+                    ret.append(j)
     (serve_dir_path / 'info.json').write_text(json.dumps(ret, indent=0))
 
 
