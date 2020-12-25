@@ -73,7 +73,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
     app.loader.load(function() {
 
       document.querySelectorAll('.loading-indicator').forEach(elem => {
-          elem.parentNode.removeChild(elem)
+        elem.parentNode.removeChild(elem);
       });
       document.body.style.cursor = 'grab';
 
@@ -190,7 +190,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           smoothed_textures = textures;
         }
         if (data.bounce !== false) {
-            smoothed_textures.push(...smoothed_textures.slice().reverse());
+          smoothed_textures.push(...smoothed_textures.slice().reverse());
         }
 
         const square = new PIXI.AnimatedSprite(smoothed_textures);
@@ -317,8 +317,8 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
 
       function calculatePuzzleProgress() {
         var totalConnections = 0,
-            correctConnections = 0;
-        Object.entries(squares).forEach(function([key, value]){
+          correctConnections = 0;
+        Object.entries(squares).forEach(function([key, value]) {
           var thisSquareNeighborIDs = getNeighborIDs(key);
           const getSquareOffsetX = function(calledSquareID) {
             return (Math.floor(squares[calledSquareID].position.x / screenSquareSize)) - getSourceRowCol(calledSquareID)[1];
@@ -326,16 +326,16 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           const getSquareOffsetY = function(calledSquareID) {
             return (Math.floor(squares[calledSquareID].position.y / screenSquareSize)) - getSourceRowCol(calledSquareID)[0];
           };
-          thisSquareNeighborIDs.forEach(function(item){
+          thisSquareNeighborIDs.forEach(function(item) {
             totalConnections++;
-            if (getSquareOffsetX(key)==getSquareOffsetX(item)&&getSquareOffsetY(key)==getSquareOffsetY(item)) {
+            if (getSquareOffsetX(key)===getSquareOffsetX(item)&&getSquareOffsetY(key)===getSquareOffsetY(item)) {
               correctConnections++;
             }
-//            console.log('checking ' + key, 'against ' + item,correctConnections + ' of ' + totalConnections + ' connections');
-          })        
+            //            console.log('checking ' + key, 'against ' + item,correctConnections + ' of ' + totalConnections + ' connections');
+          });
         });
         return Math.floor(100*correctConnections/totalConnections);
-      };
+      }
       // Save the Puzzle to local storage.
       function savePuzzleProgress() {
         var puzzleSaveIndex = JSON.parse(localStorage.getItem('puzzleSaveIndex'));
@@ -347,7 +347,6 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
           timeSaved: new Date().toISOString()
         };
         localStorage.setItem('puzzleSaveIndex', JSON.stringify(puzzleSaveIndex));
-        var date = new Date(puzzleSaveIndex[ minNumPieces + '_' + imageName ]['timeSaved']);
 
         var pieceLocations = {};
         Object.keys(squares).forEach(squareID => {
