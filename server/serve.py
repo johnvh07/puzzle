@@ -59,7 +59,7 @@ def upload_file():
         start_time = float(form['starttime'])
         if not 0 <= start_time < 1000:
             abort(Response('Illegal start time.', 404))
-        end_time = float(form['endtime'])
+        end_time = float(form['endtime']) if 'endtime' in form else 999  # I hope this doesn't confuse ffmpeg
         if not 0 <= end_time < 1000:
             abort(Response('Illegal end time.', 404))
 
