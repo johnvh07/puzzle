@@ -47,7 +47,7 @@ def upload_file():
         form = request.form.to_dict()
 
         print('files =', request.files)
-        print('form =', form)
+        print('form =', form, flush=True)
 
         if get_free_space() < 500e6:
             abort(Response('Too little space left on disk', 500))

@@ -21,20 +21,20 @@ def encode_video(filename):
     list_publicly = bool(upload_info.get('list_publicly', True))
     serve_subdir_path = (serve_dir_path / filename)  # TODO: name better
     if serve_subdir_path.exists():
-        print(f'Deleting existing directory {serve_subdir_path}')
+        print(f'Deleting existing directory {serve_subdir_path}', flush=True)
         shutil.rmtree(serve_subdir_path)
     serve_subdir_path.mkdir()
 
     def run_ffmpeg(args):
         args = ['/usr/bin/ffmpeg', '-hide_banner'] + args
-        print(f'ffmpeg_argv = {args}')
+        print(f'ffmpeg_argv = {args}', flush=True)
         ffmpeg_proc = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
         if ffmpeg_proc.returncode == 0:
-            print('ffmpeg_output =', repr(ffmpeg_proc.stdout))
+            print('ffmpeg_output =', repr(ffmpeg_proc.stdout), flush=True)
         else:
             print('FFMPEG OUTPUT:')
             print(ffmpeg_proc.stdout)
-            print('===')
+            print('===', flush=True)
             ffmpeg_proc.check_returncode()
 
     # Make jpgs
