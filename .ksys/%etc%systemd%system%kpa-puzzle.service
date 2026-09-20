@@ -1,11 +1,21 @@
 [Unit]
 Description=kpa-puzzle
 After=network.target
-OnFailure=kpa-failure-telegram@%i.service
+OnFailure=kpa-failure-telegram@%n.service
 
 [Service]
-User=nobody
-Group=nogroup
+DynamicUser=yes
+ProtectSystem=strict
+ProtectHome=yes
+
+# Persists disk caches across reboots under /var/cache/kpa-motionpuzzle
+CacheDirectory=kpa-motionpuzzle
+# Runtime directories for PID/sockets under /run/kpa-motionpuzzle
+RuntimeDirectory=kpa-motionpuzzle
+
+# RuntimeDirectory is auto-created in /run/ tmpfs
+RuntimeDirectory=kpa-motionpuzzle
+Environment=HOME=/run/kpa-motionpuzzle
 WorkingDirectory=/srv/motionpuzzle/server/
 ExecStart=/srv/motionpuzzle/server/venv/bin/gunicorn serve:app --bind 127.0.0.1:8003 -k gevent --access-logfile -
 

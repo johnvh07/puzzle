@@ -39,7 +39,7 @@ if (localStorage.getItem('puzzleSaveIndex')==null) {
 }
 var SAVE_KEY = minNumPieces + '_' + imageName;
 
-fetch(`https://petervh.com/live/${imageName}/info.json`)
+fetch(`/content/${imageName}/info.json`)
   .then(response => response.json())
   .then( function(data) {
     document.title = 'Puzzle | ' + minNumPieces + ' - ' + data.puzzlename;
@@ -67,7 +67,7 @@ fetch(`https://petervh.com/live/${imageName}/info.json`)
     window._d.app = app;
     app.stage.sortableChildren = true; // required for zIndex to have any effect
     document.body.appendChild(app.view);
-    const imgPaths = _.range(1, 1+maxFileNum).map(i => `https://petervh.com/live/${imageName}/${i}.jpg`);
+    const imgPaths = _.range(1, 1+maxFileNum).map(i => `/content/${imageName}/${i}.jpg`);
 
     imgPaths.forEach(imgPath => app.loader.add(imgPath));
     app.loader.load(function() {

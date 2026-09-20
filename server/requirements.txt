@@ -1,3 +1,6 @@
 flask
 gunicorn
 gevent
+packaging
+boto3
+botocore

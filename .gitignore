@@ -2,3 +2,4 @@ venv
 secret.txt
 server/livepuzzle-uploads
 settings.json
+b2-secrets.json

@@ -134,15 +134,15 @@
       background:#ff777d
     }
   </style>
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LJV2FB75RX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+  <!-- <\!-- Global site tag (gtag.js) - Google Analytics -\-> -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-LJV2FB75RX"></script> -->
+  <!-- <script> -->
+  <!--   window.dataLayer = window.dataLayer || []; -->
+  <!--   function gtag(){dataLayer.push(arguments);} -->
+  <!--   gtag('js', new Date()); -->
 
-    gtag('config', 'G-LJV2FB75RX');
-  </script>
+  <!--   gtag('config', 'G-LJV2FB75RX'); -->
+  <!-- </script> -->
 </head>
 
 <body>
@@ -154,13 +154,14 @@
   integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
   crossorigin="anonymous"></script>
   <script>
+    function fix_url(url) { return url.replace('https://petervh.com/live/','/content/'); }
 
-    fetch(`https://petervh.com/live/info.json`)
+    fetch(`/content/info.json`)
     .then(response => response.json())
     .then( function(data){
       _.sortBy(data, 'puzzlename').forEach( function(item ,index){
-          let thumbnail_url = item['320px_jpg'] || ('https://petervh.com/live/'+item.puzzleid+'/1.jpg');
-          let vid_thumbnail_url = item['320px_mp4'];
+          let thumbnail_url = fix_url(item['320px_jpg']) || ('/content/'+item.puzzleid+'/1.jpg');
+          let vid_thumbnail_url = fix_url(item['320px_mp4'])
           var tileTitle = '<h3>' + item.puzzlename + '</h3>',
               tileVideo = '<video alt="preview of puzzle named' + item.puzzlename + '" loop preload="none" poster="' + thumbnail_url + '"><source src="' + vid_thumbnail_url + '" type="video/mp4">Your browser does not support the video tag.<img alt="preview of puzzle named' + item.puzzlename + '" src="' + thumbnail_url + '"></video>',
               tileLinks = '<div><a href="puzzle.html?image=' + item.puzzleid + '&pieces=25">25 piece</a><a href="puzzle.html?image=' + item.puzzleid + '&pieces=100">100 piece</a><a href="puzzle.html?image=' + item.puzzleid + '&pieces=400">400 piece</a></div>';
